@@ -4,6 +4,7 @@ import (
     "log"
     "github.com/gorilla/handlers"
     "os"
+    "fmt"
     "net/http"
     "github.com/gorilla/rpc"
     "github.com/divan/gorilla-xmlrpc/xml"
@@ -76,6 +77,7 @@ func Cleaner(w http.ResponseWriter, r *http.Request) {
 
 
 func main() {
+    fmt.Println("STARTING")
     RPC := rpc.NewServer()
     xmlrpcCodec := xml.NewCodec()
     xmlrpcCodec.RegisterAlias("quick_chk", "HelloService.Say")
