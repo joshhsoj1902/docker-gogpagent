@@ -28,9 +28,49 @@
   ]
   revision = "2471d30d28b404738b546df7aaa82c45826bc02e"
 
+[[projects]]
+  branch = "master"
+  name = "github.com/xxtea/xxtea-go"
+  packages = ["xxtea"]
+  revision = "35c4b17eecf6c3c2350f8cecaf1b3f9f7fafc242"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/net"
+  packages = [
+    "html",
+    "html/atom",
+    "html/charset"
+  ]
+  revision = "afe8f62b1d6bbd81f31868121a50b06d8188e1f9"
+
+[[projects]]
+  name = "golang.org/x/text"
+  packages = [
+    "encoding",
+    "encoding/charmap",
+    "encoding/htmlindex",
+    "encoding/internal",
+    "encoding/internal/identifier",
+    "encoding/japanese",
+    "encoding/korean",
+    "encoding/simplifiedchinese",
+    "encoding/traditionalchinese",
+    "encoding/unicode",
+    "internal/gen",
+    "internal/tag",
+    "internal/utf8internal",
+    "language",
+    "runes",
+    "transform",
+    "unicode/cldr"
+  ]
+  revision = "f21a4dfb5e38f5895301dc265a8def02365cc3d0"
+  version = "v0.3.0"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "ede1ffad323ead2c86a376c4ab8fba0f58c9ff01dbc9b13fb7641d07cfd35a30"
+  inputs-digest = "7c726cf3a3a365ac6c8677e414bb9076a60a6f96c9ce962da5cb2fb0c22d2b87"
   solver-name = "gps-cdcl"
   solver-version = 1
