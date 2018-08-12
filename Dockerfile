@@ -5,4 +5,5 @@ WORKDIR /go/src/github.com/joshhsoj1902/docker-gogpagent
 RUN env
 RUN ls -ltr
 RUN make build
+ENV USERNAME=agent
 CMD ["/go/src/github.com/joshhsoj1902/docker-gogpagent/main"]
