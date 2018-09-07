@@ -1,4 +1,4 @@
-FROM golang:latest@sha256:db260e19d31a9c6794d35aae1bf2cd30f1b4db88c3094a18299c10ed02eb4dee
+FROM golang:latest@sha256:e8e4c4406217b415c506815d38e3f8ac6e05d0121b19f686c5af7eaadf96f081
 RUN mkdir -p /go/src/github.com/joshhsoj1902/docker-gogpagent
 ADD . /go/src/github.com/joshhsoj1902/docker-gogpagent/
 WORKDIR /go/src/github.com/joshhsoj1902/docker-gogpagent
