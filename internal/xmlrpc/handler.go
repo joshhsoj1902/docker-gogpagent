@@ -1,9 +1,8 @@
-package main
+package xmlrpc
 
 import (
 	"io"
     "log"
-    "github.com/gorilla/handlers"
     "os"
     "fmt"
     "net/http"
@@ -1128,17 +1127,4 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	default:
 		fmt.Printf("MethodName %s NOT SUPPORTED \n Body: %s", v.MethodName, Body)
     }
-}
-
-
-
-
-
-func main() {
-    log.Println("STARTING")
-
-    http.HandleFunc("/RPC2", Handler)
-
-    log.Println("Starting XML-RPC server on localhost:12679/RPC2")
-    log.Fatal(http.ListenAndServe(":12679", handlers.LoggingHandler(os.Stdout, http.DefaultServeMux)))
 }
