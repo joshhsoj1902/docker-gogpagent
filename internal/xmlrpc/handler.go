@@ -3,16 +3,13 @@ package xmlrpc
 import (
 	"io"
     "log"
-    "os"
     "fmt"
     "net/http"
 	"encoding/xml"
-	"encoding/base64"
 	"bytes"
 	"strings"
 
 	"golang.org/x/net/html/charset"
-	"github.com/xxtea/xxtea-go/xxtea"
 
 	"io/ioutil"
 	"os/exec"
@@ -20,154 +17,6 @@ import (
 
 type StringParam struct {
 	Value string `xml:"value>string"`
-}
-
-func Decode (src string) (string, error) {
-	// Decode and Decrypt params
-	decodeData1, err := base64.StdEncoding.DecodeString(src)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-		return "", err
-	}
-	decrypt_data := string(xxtea.Decrypt(decodeData1, []byte(os.Getenv("OGP_KEY"))))
-	decodeData2, err := base64.StdEncoding.DecodeString(decrypt_data)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-		return "", err
-	}
-	return string(decodeData2), nil
-}
-
-func Encode (src string) (string, error) {
-	// Decode and Decrypt params
-	encodeData1 := base64.StdEncoding.EncodeToString([]byte(src))
-	// if err != nil {
-	// 	fmt.Printf("error: %v\n", err)
-	// 	return "", err
-	// }
-	encode_data := string(xxtea.Encrypt([]byte(encodeData1), []byte(os.Getenv("OGP_KEY"))))
-	encodeData2 := base64.StdEncoding.EncodeToString([]byte(encode_data))
-
-	return string(encodeData2), nil
-}
-
-//SHOULD WORK
-func quick_chk(body io.Reader) []byte {
-	type MethodCall struct {
-		XMLName xml.Name `xml:"methodCall"`
-		Params []StringParam	`xml:"params>param"`
-	}
-	type Result struct {
-		XMLName   xml.Name `xml:"methodResponse"`
-		Param     int      `xml:"params>param>value>int"`
-	}
-	var myResult = 0
-
-	v := MethodCall{Params: nil}
-
-    decoder := xml.NewDecoder(body)
-    decoder.CharsetReader = charset.NewReaderLabel
-    err := decoder.Decode(&v)
-	fmt.Printf("decoded PARAMS %s\n", v)
-	
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-		myResult = 1
-	}
-
-	value, err := Decode(v.Params[0].Value)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-		myResult = 1
-	}
-	fmt.Printf("value %s\n", value)
-
-	xmlResult := &Result{Param: myResult}
-
-	fmt.Printf("encodedResult: %v\n", xmlResult)
-
-	enc, err := xml.MarshalIndent(xmlResult, "  ", "    ")
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-
-	return enc
-}
-
-//WORKING
-func rpc_what_os(body io.Reader) []byte {
-	type MethodCall struct {
-		XMLName xml.Name `xml:"methodCall"`
-		Params []StringParam	`xml:"params>param"`
-	}
-	type Result struct {
-		XMLName   xml.Name `xml:"methodResponse"`
-		Param     string      `xml:"params>param>value>string"`
-	}
-	var myResult = "1; Linux x86_64"
-
-	v := MethodCall{Params: nil}
-
-    decoder := xml.NewDecoder(body)
-    decoder.CharsetReader = charset.NewReaderLabel
-    err := decoder.Decode(&v)
-	
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-
-	value, err := Decode(v.Params[0].Value)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-	fmt.Printf("What OS value %s\n", value)
-
-	xmlResult := &Result{Param: myResult}
-
-	enc, err := xml.MarshalIndent(xmlResult, "  ", "    ")
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-
-	return enc
-}
-
-// SHOULD WORK
-func rpc_cpu_count(body io.Reader) []byte {
-	type MethodCall struct {
-		XMLName xml.Name `xml:"methodCall"`
-		Params []StringParam	`xml:"params>param"`
-	}
-	type Result struct {
-		XMLName   xml.Name `xml:"methodResponse"`
-		Param     int      `xml:"params>param>value>int"`
-	}
-	var myResult = 1
-
-	v := MethodCall{Params: nil}
-
-    decoder := xml.NewDecoder(body)
-    decoder.CharsetReader = charset.NewReaderLabel
-    err := decoder.Decode(&v)
-	
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-
-	value, err := Decode(v.Params[0].Value)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-	fmt.Printf("COU COUNT value %s\n", value)
-
-	xmlResult := &Result{Param: myResult}
-
-	enc, err := xml.MarshalIndent(xmlResult, "  ", "    ")
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-
-	return enc
 }
 
 //BUGGY
@@ -1101,13 +950,13 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	case "exec":
 		w.Write(rpc_exec(bytes.NewReader(Body)))
 	case "what_os":
-		w.Write(rpc_what_os(bytes.NewReader(Body)))
+		w.Write(what_os(bytes.NewReader(Body)))
 	case "discover_ips":
 		w.Write(rpc_discover_ips(bytes.NewReader(Body)))
 	case "ftp_mgr":
 		w.Write(rpc_ftp_mgr(bytes.NewReader(Body)))
 	case "cpu_count":
-		w.Write(rpc_cpu_count(bytes.NewReader(Body)))
+		w.Write(cpu_count(bytes.NewReader(Body)))
 	case "is_screen_running":
 		w.Write(rpc_is_screen_running(bytes.NewReader(Body)))
 	case "rfile_exists":
