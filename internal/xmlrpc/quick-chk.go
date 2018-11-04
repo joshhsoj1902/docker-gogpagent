@@ -33,7 +33,6 @@ func decode_check(body io.Reader) (error, *Check) {
 	return nil, check
 }
 
-//SHOULD WORK
 func quick_chk(body io.Reader) []byte {
 	var myResult = 0
 

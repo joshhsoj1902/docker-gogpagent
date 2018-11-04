@@ -19,44 +19,6 @@ type StringParam struct {
 	Value string `xml:"value>string"`
 }
 
-// SHOULD WORK
-func rpc_cpu_count(body io.Reader) []byte {
-	type MethodCall struct {
-		XMLName xml.Name `xml:"methodCall"`
-		Params []StringParam	`xml:"params>param"`
-	}
-	type Result struct {
-		XMLName   xml.Name `xml:"methodResponse"`
-		Param     int      `xml:"params>param>value>int"`
-	}
-	var myResult = 1
-
-	v := MethodCall{Params: nil}
-
-    decoder := xml.NewDecoder(body)
-    decoder.CharsetReader = charset.NewReaderLabel
-    err := decoder.Decode(&v)
-	
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-
-	value, err := Decode(v.Params[0].Value)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-	fmt.Printf("COU COUNT value %s\n", value)
-
-	xmlResult := &Result{Param: myResult}
-
-	enc, err := xml.MarshalIndent(xmlResult, "  ", "    ")
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-
-	return enc
-}
-
 //BUGGY
 func rpc_discover_ips(body io.Reader) []byte {
 	type MethodCall struct {
@@ -994,7 +956,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	case "ftp_mgr":
 		w.Write(rpc_ftp_mgr(bytes.NewReader(Body)))
 	case "cpu_count":
-		w.Write(rpc_cpu_count(bytes.NewReader(Body)))
+		w.Write(cpu_count(bytes.NewReader(Body)))
 	case "is_screen_running":
 		w.Write(rpc_is_screen_running(bytes.NewReader(Body)))
 	case "rfile_exists":

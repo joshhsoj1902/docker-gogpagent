@@ -1,4 +1,4 @@
-// WORKING
+// Should work
 package xmlrpc
 
 import (
@@ -7,43 +7,43 @@ import (
 	"encoding/xml"
 )
 
-type WhatOs struct {
+type CpuCount struct {
 	XMLName xml.Name `xml:"methodCall"`
 	MethodCall 	string `xml:"methodName"`
 	Value 		string `xml:"params>param>value>string"`
 }
 
-type WhatOsResult struct {
+type CpuCountResult struct {
 	XMLName   xml.Name `xml:"methodResponse"`
-	Param     string      `xml:"params>param>value>string"`
+	Param     int      `xml:"params>param>value>int"`
 }
 
-func decode_what_os(body io.Reader) (error, *WhatOs) {
-	what_os := new(WhatOs)
-	err := decode_body(body, what_os)
+func decode_cpu_count(body io.Reader) (error, *CpuCount) {
+	cpu_count := new(CpuCount)
+	err := decode_body(body, cpu_count)
 	// fmt.Printf("checks %+v\n", check)
 	if err != nil {
 		return err, nil
 	}
 
-	err = Decode2(&what_os.Value)
+	err = Decode2(&cpu_count.Value)
 	if err != nil {
 		return err, nil
 	}
-	return nil, what_os
+	return nil, cpu_count
 }
 
-func what_os(body io.Reader) []byte {
-	var myResult = "1; Linux x86_64"
+func cpu_count(body io.Reader) []byte {
+	var myResult = 1
 
-	err, what_os := decode_what_os(body)
+	err, what_os := decode_cpu_count(body)
 	if err != nil {
 		fmt.Printf("Error decoding: %v\n", err)
 	}
 	
 	fmt.Printf("value %s\n", what_os.Value)
 
-	xmlResult := &WhatOsResult{Param: myResult}
+	xmlResult := &CpuCountResult{Param: myResult}
 
 	fmt.Printf("encodedResult: %v\n", xmlResult)
 
