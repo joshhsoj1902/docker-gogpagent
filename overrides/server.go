@@ -123,26 +123,20 @@ func (c *CodecRequest) WriteResponse(w http.ResponseWriter, response interface{}
 	var xmlstr string
 
 	if c.err != nil {
-	fmt.Printf("WriteResponse2: %+v\n",c.err)
 
 		var fault Fault
 		switch c.err.(type) {
 		case Fault:
-			fmt.Printf("WriteResponse3: %+v\n","Foo")
 			fault = c.err.(Fault)
 		default:
-			fmt.Printf("WriteResponse4: %+v\n","bar")
 			fault = FaultApplicationError
 			fault.String += fmt.Sprintf(": %v", c.err)
 		}
 		xmlstr = fault2XML(fault)
-		fmt.Printf("WriteResponse4.1: %+v\n",xmlstr)
 
 	} else {
-	fmt.Printf("WriteResponse5: %+v\n","Foo")
 
 		xmlstr, _ = rpcResponse2XML(response)
-	fmt.Printf("WriteResponse5.1: %+v\n",xmlstr)
 
 	}
 

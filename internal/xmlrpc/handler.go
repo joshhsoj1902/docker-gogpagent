@@ -921,7 +921,7 @@ func rpc_writefile(body io.Reader) []byte {
 type AgentService struct{}
 
 func (agent *AgentService) Quick_chk(r *http.Request, args *struct{test string}, reply *struct{Message int}) error {
-	fmt.Println("quick_chk CALLED")
+	fmt.Println("==== quick_chk ====")
 	var myResult = 0
 
 	err := Decode2(&args.test)
@@ -938,7 +938,7 @@ func (agent *AgentService) Quick_chk(r *http.Request, args *struct{test string},
 }
 
 func (agent *AgentService) What_os(r *http.Request, args *struct{test string}, reply *struct{Message string}) error {
-	fmt.Println("What_os CALLED")
+	fmt.Println("==== What_os ====")
 	var myResult = "1; Linux x86_64"
 
 	err := Decode2(&args.test)
@@ -954,7 +954,7 @@ func (agent *AgentService) What_os(r *http.Request, args *struct{test string}, r
 }
 
 func (agent *AgentService) Discover_ips(r *http.Request, args *struct{test string}, reply *struct{Message string}) error {
-	fmt.Println("Discover_ips CALLED")
+	fmt.Println("==== Discover_ips ====")
 	var myResult = "0.0.0.0"
 
 	err := Decode2(&args.test)
@@ -970,7 +970,7 @@ func (agent *AgentService) Discover_ips(r *http.Request, args *struct{test strin
 }
 
 func (agent *AgentService) Cpu_count(r *http.Request, args *struct{test string}, reply *struct{Message int}) error {
-	fmt.Println("Cpu_count CALLED")
+	fmt.Println("==== Cpu_count ====")
 	var myResult = 1
 
 	err := Decode2(&args.test)
@@ -986,7 +986,7 @@ func (agent *AgentService) Cpu_count(r *http.Request, args *struct{test string},
 }
 
 func (agent *AgentService) Exec(r *http.Request, args *struct{test string }, reply *struct{Message string}) error {
-	fmt.Println("Exec CALLED")
+	fmt.Println("==== Exec =====")
 	var myResult = "foo"
 
 	err := Decode2(&args.test)

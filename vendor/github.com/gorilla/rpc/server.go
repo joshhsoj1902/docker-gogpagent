@@ -158,6 +158,10 @@ func (s *Server) RegisterAfterFunc(f func(i *RequestInfo)) {
 
 // ServeHTTP
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+    fmt.Println("")
+    fmt.Println("")
+    fmt.Println("")
+    fmt.Println("")
     fmt.Println("INSIDE ServeHTTP 1")
 
 	if r.Method != "POST" {
@@ -187,7 +191,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	codecReq := codec.NewRequest(r)
 	// Get service method to be called.
 	method, errMethod := codecReq.Method()
-	fmt.Printf("Method: %+v\n",method)
+	fmt.Printf("====================\nMethod: %+v\n====================\n",method)
 	fmt.Printf("errMethod: %+v\n",errMethod)
 
 	if errMethod != nil {
