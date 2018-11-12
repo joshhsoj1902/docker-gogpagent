@@ -1017,7 +1017,41 @@ func (agent *AgentService) Exec(r *http.Request, args *struct{test string }, rep
 }
 
 
+func (agent *AgentService) Ftp_mgr(r *http.Request, args *struct{test string}, reply *struct{Message int}) error {
+	fmt.Println("==== Ftp_mgr ====")
+	var myResult = 1
 
+	err := Decode2(&args.test)
+	if err != nil {
+		fmt.Printf("Error decoding: %v\n", err)
+	}
+
+	reply.Message = myResult
+	
+	fmt.Printf("decoded Arg: %v\n", args.test)
+	fmt.Printf("reply.Message: %v\n", reply.Message)
+    return nil
+}
+
+// WORKING
+/// \return 1 If is
+/// \return 0 If is not
+/// \return -1 If agent could not be reached.
+func (agent *AgentService) Is_screen_running(r *http.Request, args *struct{test string}, reply *struct{Message int}) error {
+	fmt.Println("==== Is_screen_running ====")
+	var myResult = 1
+
+	err := Decode2(&args.test)
+	if err != nil {
+		fmt.Printf("Error decoding: %v\n", err)
+	}
+
+	reply.Message = myResult
+	
+	fmt.Printf("decoded Arg: %v\n", args.test)
+	fmt.Printf("reply.Message: %v\n", reply.Message)
+    return nil
+}
 
 
 func HttpHandler(w http.ResponseWriter, r *http.Request) {
@@ -1056,12 +1090,12 @@ func HttpHandler(w http.ResponseWriter, r *http.Request) {
 	// 	w.Write(what_os(bytes.NewReader(Body)))
 	// case "discover_ips":
 	// 	w.Write(discover_ips(bytes.NewReader(Body)))
-	case "ftp_mgr":
-		w.Write(rpc_ftp_mgr(bytes.NewReader(Body)))
+	// case "ftp_mgr":
+	// 	w.Write(rpc_ftp_mgr(bytes.NewReader(Body)))
 	// case "cpu_count":
 	// 	w.Write(cpu_count(bytes.NewReader(Body)))
-	case "is_screen_running":
-		w.Write(rpc_is_screen_running(bytes.NewReader(Body)))
+	// case "is_screen_running":
+	// 	w.Write(rpc_is_screen_running(bytes.NewReader(Body)))
 	case "rfile_exists":
 		w.Write(rpc_rfile_exists(bytes.NewReader(Body)))
 	case "start_server":
