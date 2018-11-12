@@ -1,7 +1,7 @@
 package xmlrpc
 
 import (
-	"io"
+	// "io"
     // "log"
     "fmt"
     "net/http"
@@ -17,567 +17,6 @@ import (
 type StringParam struct {
 	Value string `xml:"value>string"`
 }
-
-func rpc_start_server(body io.Reader) []byte {
-	type MethodCall struct {
-		XMLName xml.Name `xml:"methodCall"`
-		Params []StringParam	`xml:"params>param"`
-	}
-	type Result struct {
-		XMLName   xml.Name `xml:"methodResponse"`
-		Param     int      `xml:"params>param>value>int"`
-	}
-	var myResult = 1
-
-	v := MethodCall{Params: nil}
-
-    decoder := xml.NewDecoder(body)
-    decoder.CharsetReader = charset.NewReaderLabel
-    err := decoder.Decode(&v)
-	
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-
-	value, err := Decode(v.Params[0].Value)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-	fmt.Printf("stop_server 1 value %s\n", value)
-
-
-	value, err = Decode(v.Params[1].Value)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-	fmt.Printf("stop_server 2 value %s\n", value)
-
-
-	value, err = Decode(v.Params[2].Value)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-	fmt.Printf("stop_server 3 value %s\n", value)
-
-
-	value, err = Decode(v.Params[3].Value)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-	fmt.Printf("stop_server 4 value %s\n", value)
-
-	value, err = Decode(v.Params[4].Value)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-	fmt.Printf("stop_server 5 value %s\n", value)
-
-	value, err = Decode(v.Params[5].Value)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-	fmt.Printf("stop_server 6 value %s\n", value)
-
-	value, err = Decode(v.Params[6].Value)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-	fmt.Printf("stop_server 7 value %s\n", value)
-
-	value, err = Decode(v.Params[7].Value)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-	fmt.Printf("stop_server 8 value %s\n", value)
-
-
-
-
-	xmlResult := &Result{Param: myResult}
-
-	enc, err := xml.MarshalIndent(xmlResult, "  ", "    ")
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-
-	return enc
-}
-
-func rpc_restart_server(body io.Reader) []byte {
-	type MethodCall struct {
-		XMLName xml.Name `xml:"methodCall"`
-		Params []StringParam	`xml:"params>param"`
-	}
-	type Result struct {
-		XMLName   xml.Name `xml:"methodResponse"`
-		Param     int      `xml:"params>param>value>int"`
-	}
-	var myResult = 1
-
-	v := MethodCall{Params: nil}
-
-    decoder := xml.NewDecoder(body)
-    decoder.CharsetReader = charset.NewReaderLabel
-    err := decoder.Decode(&v)
-	
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-
-	value, err := Decode(v.Params[0].Value)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-	fmt.Printf("stop_server 1 value %s\n", value)
-
-
-	value, err = Decode(v.Params[1].Value)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-	fmt.Printf("stop_server 2 value %s\n", value)
-
-
-	value, err = Decode(v.Params[2].Value)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-	fmt.Printf("stop_server 3 value %s\n", value)
-
-
-	value, err = Decode(v.Params[3].Value)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-	fmt.Printf("stop_server 4 value %s\n", value)
-
-	value, err = Decode(v.Params[4].Value)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-	fmt.Printf("stop_server 5 value %s\n", value)
-
-	value, err = Decode(v.Params[5].Value)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-	fmt.Printf("stop_server 6 value %s\n", value)
-
-	value, err = Decode(v.Params[6].Value)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-	fmt.Printf("stop_server 7 value %s\n", value)
-
-	value, err = Decode(v.Params[7].Value)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-	fmt.Printf("stop_server 8 value %s\n", value)
-
-	value, err = Decode(v.Params[8].Value)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-	fmt.Printf("stop_server 9 value %s\n", value)
-
-	value, err = Decode(v.Params[9].Value)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-	fmt.Printf("stop_server 10 value %s\n", value)
-
-	value, err = Decode(v.Params[10].Value)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-	fmt.Printf("stop_server 11 value %s\n", value)
-
-	value, err = Decode(v.Params[11].Value)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-	fmt.Printf("stop_server 12 value %s\n", value)
-
-	value, err = Decode(v.Params[12].Value)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-	fmt.Printf("stop_server 13 value %s\n", value)
-
-	value, err = Decode(v.Params[13].Value)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-	fmt.Printf("stop_server 14 value %s\n", value)
-
-	value, err = Decode(v.Params[14].Value)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-	fmt.Printf("stop_server 15 value %s\n", value)
-
-	value, err = Decode(v.Params[15].Value)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-	fmt.Printf("stop_server 16 value %s\n", value)
-
-
-
-
-	xmlResult := &Result{Param: myResult}
-
-	enc, err := xml.MarshalIndent(xmlResult, "  ", "    ")
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-
-	return enc
-}
-
-func rpc_stop_server(body io.Reader) []byte {
-	type MethodCall struct {
-		XMLName xml.Name `xml:"methodCall"`
-		Params []StringParam	`xml:"params>param"`
-	}
-	type Result struct {
-		XMLName   xml.Name `xml:"methodResponse"`
-		Param     int      `xml:"params>param>value>int"`
-	}
-	var myResult = 1
-
-	v := MethodCall{Params: nil}
-
-    decoder := xml.NewDecoder(body)
-    decoder.CharsetReader = charset.NewReaderLabel
-    err := decoder.Decode(&v)
-	
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-
-	value, err := Decode(v.Params[0].Value)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-	fmt.Printf("stop_server 1 value %s\n", value)
-
-
-	value, err = Decode(v.Params[1].Value)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-	fmt.Printf("stop_server 2 value %s\n", value)
-
-
-	value, err = Decode(v.Params[2].Value)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-	fmt.Printf("stop_server 3 value %s\n", value)
-
-
-	value, err = Decode(v.Params[3].Value)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-	fmt.Printf("stop_server 4 value %s\n", value)
-
-	value, err = Decode(v.Params[4].Value)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-	fmt.Printf("stop_server 5 value %s\n", value)
-
-	value, err = Decode(v.Params[5].Value)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-	fmt.Printf("stop_server 6 value %s\n", value)
-
-	value, err = Decode(v.Params[6].Value)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-	fmt.Printf("stop_server 7 value %s\n", value)
-
-	value, err = Decode(v.Params[7].Value)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-	fmt.Printf("stop_server 8 value %s\n", value)
-
-
-
-
-	xmlResult := &Result{Param: myResult}
-
-	enc, err := xml.MarshalIndent(xmlResult, "  ", "    ")
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-
-	return enc
-}
-
-func rpc_get_log(body io.Reader) []byte {
-	type MethodCall struct {
-		XMLName xml.Name `xml:"methodCall"`
-		Params []StringParam	`xml:"params>param"`
-	}
-	type Result struct {
-		XMLName   xml.Name `xml:"methodResponse"`
-		Param     string      `xml:"params>param>value>string"`
-	}
-	var myResult = "1; blah"
-
-	v := MethodCall{Params: nil}
-
-    decoder := xml.NewDecoder(body)
-    decoder.CharsetReader = charset.NewReaderLabel
-    err := decoder.Decode(&v)
-	
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-
-	value, err := Decode(v.Params[0].Value)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-	fmt.Printf("stop_server 1 value %s\n", value)
-
-
-	value, err = Decode(v.Params[1].Value)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-	fmt.Printf("stop_server 2 value %s\n", value)
-
-
-	value, err = Decode(v.Params[2].Value)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-	fmt.Printf("stop_server 3 value %s\n", value)
-
-
-	value, err = Decode(v.Params[3].Value)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-	fmt.Printf("stop_server 4 value %s\n", value)
-
-	value, err = Decode(v.Params[4].Value)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-	fmt.Printf("stop_server 5 value %s\n", value)
-
-	value, err = Decode(v.Params[5].Value)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-	fmt.Printf("stop_server 6 value %s\n", value)
-
-	// value, err = Decode(v.Params[6].Value)
-	// if err != nil {
-	// 	fmt.Printf("error: %v\n", err)
-	// }
-	// fmt.Printf("stop_server 7 value %s\n", value)
-
-	// value, err = Decode(v.Params[7].Value)
-	// if err != nil {
-	// 	fmt.Printf("error: %v\n", err)
-	// }
-	// fmt.Printf("stop_server 8 value %s\n", value)
-
-
-
-
-	xmlResult := &Result{Param: myResult}
-
-	enc, err := xml.MarshalIndent(xmlResult, "  ", "    ")
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-
-	return enc
-}
-
-func rpc_readfile(body io.Reader) []byte {
-	type MethodCall struct {
-		XMLName xml.Name `xml:"methodCall"`
-		Params []StringParam	`xml:"params>param"`
-	}
-	type Result struct {
-		XMLName   xml.Name `xml:"methodResponse"`
-		Param     string      `xml:"params>param>value>string"`
-	}
-	var myResult = "1; blah"
-
-	v := MethodCall{Params: nil}
-
-    decoder := xml.NewDecoder(body)
-    decoder.CharsetReader = charset.NewReaderLabel
-    err := decoder.Decode(&v)
-	
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-
-	value, err := Decode(v.Params[0].Value)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-	fmt.Printf("stop_server 1 value %s\n", value)
-
-
-	value, err = Decode(v.Params[1].Value)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-	fmt.Printf("stop_server 2 value %s\n", value)
-
-
-	// value, err = Decode(v.Params[2].Value)
-	// if err != nil {
-	// 	fmt.Printf("error: %v\n", err)
-	// }
-	// fmt.Printf("stop_server 3 value %s\n", value)
-
-
-	// value, err = Decode(v.Params[3].Value)
-	// if err != nil {
-	// 	fmt.Printf("error: %v\n", err)
-	// }
-	// fmt.Printf("stop_server 4 value %s\n", value)
-
-	// value, err = Decode(v.Params[4].Value)
-	// if err != nil {
-	// 	fmt.Printf("error: %v\n", err)
-	// }
-	// fmt.Printf("stop_server 5 value %s\n", value)
-
-	// value, err = Decode(v.Params[5].Value)
-	// if err != nil {
-	// 	fmt.Printf("error: %v\n", err)
-	// }
-	// fmt.Printf("stop_server 6 value %s\n", value)
-
-	// value, err = Decode(v.Params[6].Value)
-	// if err != nil {
-	// 	fmt.Printf("error: %v\n", err)
-	// }
-	// fmt.Printf("stop_server 7 value %s\n", value)
-
-	// value, err = Decode(v.Params[7].Value)
-	// if err != nil {
-	// 	fmt.Printf("error: %v\n", err)
-	// }
-	// fmt.Printf("stop_server 8 value %s\n", value)
-
-
-
-
-	xmlResult := &Result{Param: myResult}
-
-	enc, err := xml.MarshalIndent(xmlResult, "  ", "    ")
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-
-	return enc
-}
-
-func rpc_writefile(body io.Reader) []byte {
-	type MethodCall struct {
-		XMLName xml.Name `xml:"methodCall"`
-		Params []StringParam	`xml:"params>param"`
-	}
-	type Result struct {
-		XMLName   xml.Name `xml:"methodResponse"`
-		Param     string      `xml:"params>param>value>string"`
-	}
-	var myResult = "1; blah"
-
-	v := MethodCall{Params: nil}
-
-    decoder := xml.NewDecoder(body)
-    decoder.CharsetReader = charset.NewReaderLabel
-    err := decoder.Decode(&v)
-	
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-
-	value, err := Decode(v.Params[0].Value)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-	fmt.Printf("stop_server 1 value %s\n", value)
-
-
-	value, err = Decode(v.Params[1].Value)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-	fmt.Printf("stop_server 2 value %s\n", value)
-
-
-	value, err = Decode(v.Params[2].Value)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-	fmt.Printf("stop_server 3 value %s\n", value)
-
-
-	// value, err = Decode(v.Params[3].Value)
-	// if err != nil {
-	// 	fmt.Printf("error: %v\n", err)
-	// }
-	// fmt.Printf("stop_server 4 value %s\n", value)
-
-	// value, err = Decode(v.Params[4].Value)
-	// if err != nil {
-	// 	fmt.Printf("error: %v\n", err)
-	// }
-	// fmt.Printf("stop_server 5 value %s\n", value)
-
-	// value, err = Decode(v.Params[5].Value)
-	// if err != nil {
-	// 	fmt.Printf("error: %v\n", err)
-	// }
-	// fmt.Printf("stop_server 6 value %s\n", value)
-
-	// value, err = Decode(v.Params[6].Value)
-	// if err != nil {
-	// 	fmt.Printf("error: %v\n", err)
-	// }
-	// fmt.Printf("stop_server 7 value %s\n", value)
-
-	// value, err = Decode(v.Params[7].Value)
-	// if err != nil {
-	// 	fmt.Printf("error: %v\n", err)
-	// }
-	// fmt.Printf("stop_server 8 value %s\n", value)
-
-
-
-
-	xmlResult := &Result{Param: myResult}
-
-	enc, err := xml.MarshalIndent(xmlResult, "  ", "    ")
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-
-	return enc
-}
-
-
-
 
 type AgentService struct{}
 
@@ -733,6 +172,101 @@ func (agent *AgentService) Rfile_exists(r *http.Request, args *struct{test strin
     return nil
 }
 
+func (agent *AgentService) Start_server(r *http.Request, args *struct{test string}, reply *struct{Message int}) error {
+	fmt.Println("==== Start_server ====")
+	var myResult = 1
+
+	err := Decode2(&args.test)
+	if err != nil {
+		fmt.Printf("Error decoding: %v\n", err)
+	}
+
+	reply.Message = myResult
+	
+	fmt.Printf("decoded Arg: %v\n", args.test)
+	fmt.Printf("reply.Message: %v\n", reply.Message)
+    return nil
+}
+
+func (agent *AgentService) Restart_server(r *http.Request, args *struct{test string}, reply *struct{Message int}) error {
+	fmt.Println("==== Restart_server ====")
+	var myResult = 1
+
+	err := Decode2(&args.test)
+	if err != nil {
+		fmt.Printf("Error decoding: %v\n", err)
+	}
+
+	reply.Message = myResult
+	
+	fmt.Printf("decoded Arg: %v\n", args.test)
+	fmt.Printf("reply.Message: %v\n", reply.Message)
+    return nil
+}
+
+func (agent *AgentService) Stop_server(r *http.Request, args *struct{test string}, reply *struct{Message int}) error {
+	fmt.Println("==== Stop_server ====")
+	var myResult = 1
+
+	err := Decode2(&args.test)
+	if err != nil {
+		fmt.Printf("Error decoding: %v\n", err)
+	}
+
+	reply.Message = myResult
+	
+	fmt.Printf("decoded Arg: %v\n", args.test)
+	fmt.Printf("reply.Message: %v\n", reply.Message)
+    return nil
+}
+
+func (agent *AgentService) Get_log(r *http.Request, args *struct{test string}, reply *struct{Message int}) error {
+	fmt.Println("==== Get_log ====")
+	var myResult = 1
+
+	err := Decode2(&args.test)
+	if err != nil {
+		fmt.Printf("Error decoding: %v\n", err)
+	}
+
+	reply.Message = myResult
+	
+	fmt.Printf("decoded Arg: %v\n", args.test)
+	fmt.Printf("reply.Message: %v\n", reply.Message)
+    return nil
+}
+
+func (agent *AgentService) Readfile(r *http.Request, args *struct{test string}, reply *struct{Message int}) error {
+	fmt.Println("==== Readfile ====")
+	var myResult = 1
+
+	err := Decode2(&args.test)
+	if err != nil {
+		fmt.Printf("Error decoding: %v\n", err)
+	}
+
+	reply.Message = myResult
+	
+	fmt.Printf("decoded Arg: %v\n", args.test)
+	fmt.Printf("reply.Message: %v\n", reply.Message)
+    return nil
+}
+
+func (agent *AgentService) Writefile(r *http.Request, args *struct{test string}, reply *struct{Message int}) error {
+	fmt.Println("==== Writefile ====")
+	var myResult = 1
+
+	err := Decode2(&args.test)
+	if err != nil {
+		fmt.Printf("Error decoding: %v\n", err)
+	}
+
+	reply.Message = myResult
+	
+	fmt.Printf("decoded Arg: %v\n", args.test)
+	fmt.Printf("reply.Message: %v\n", reply.Message)
+    return nil
+}
 
 func HttpHandler(w http.ResponseWriter, r *http.Request) {
     type MethodCall struct {
@@ -762,18 +296,7 @@ func HttpHandler(w http.ResponseWriter, r *http.Request) {
 	// fmt.Printf("MethodName %s Being Called \n Body: %s", v.MethodName, Body)
 
 	switch v.MethodName {
-	case "start_server":
-		w.Write(rpc_start_server(bytes.NewReader(Body)))
-	case "restart_server":
-		w.Write(rpc_restart_server(bytes.NewReader(Body)))
-	case "stop_server":
-		w.Write(rpc_stop_server(bytes.NewReader(Body)))
-	case "get_log":
-		w.Write(rpc_get_log(bytes.NewReader(Body)))
-	case "readfile":
-		w.Write(rpc_readfile(bytes.NewReader(Body)))
-	case "writefile":
-		w.Write(rpc_writefile(bytes.NewReader(Body)))
+
 	default:
 		fmt.Printf("MethodName %s NOT SUPPORTED \n Body: %s", v.MethodName, Body)
     }
