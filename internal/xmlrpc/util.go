@@ -7,10 +7,15 @@ import (
 	"encoding/base64"
 	"github.com/xxtea/xxtea-go/xxtea"
     "os"
-
+	"reflect"
 
 	"golang.org/x/net/html/charset"
 )
+
+type GenericMethodCall struct {
+	XMLName xml.Name `xml:"methodCall"`
+	Params []interface{}	`xml:"params>param"`
+}
 
 func Decode2 (src *string) error {
 	// Decode and Decrypt params
@@ -57,9 +62,34 @@ func Encode (src string) (string, error) {
 }
 
 func decode_body(body io.Reader, o interface{}) error {
-	decoder2 := xml.NewDecoder(body)
-    decoder2.CharsetReader = charset.NewReaderLabel
-    err := decoder2.Decode(&o)
+	decoder := xml.NewDecoder(body)
+    decoder.CharsetReader = charset.NewReaderLabel
+    err := decoder.Decode(&o)
+
+	return err
+}
+
+func decode_body2(body io.Reader, o interface{}) error {
+	gmc := new(GenericMethodCall)
+
+	decoder := xml.NewDecoder(body)
+    decoder.CharsetReader = charset.NewReaderLabel
+    err := decoder.Decode(&gmc)
+
+	fmt.Printf("gmc %+v\n", gmc)	
+
+	v := reflect.ValueOf(o)
+
+    values := make([]interface{}, v.NumField())
+
+    for i := 0; i < v.NumField(); i++ {
+        values[i] = v.Field(i).Interface()
+    }
+
+    fmt.Println(values)
+
+	fmt.Printf("FOR DONE %+v\n", gmc.XMLName)	
+
 
 	return err
 }

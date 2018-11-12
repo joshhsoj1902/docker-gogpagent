@@ -2,138 +2,137 @@ package xmlrpc
 
 import (
 	"io"
-    "log"
+    // "log"
     "fmt"
     "net/http"
 	"encoding/xml"
 	"bytes"
-	"strings"
+	// "strings"
 
 	"golang.org/x/net/html/charset"
 
 	"io/ioutil"
-	"os/exec"
 )
 
 type StringParam struct {
 	Value string `xml:"value>string"`
 }
 
-//BUGGY
-func rpc_discover_ips(body io.Reader) []byte {
-	type MethodCall struct {
-		XMLName xml.Name `xml:"methodCall"`
-		Params []StringParam	`xml:"params>param"`
-	}
-	type Result struct {
-		XMLName   xml.Name `xml:"methodResponse"`
-		Param     string      `xml:"params>param>value>string"`
-	}
-	var myResult = "0.0.0.0"
+// //BUGGY
+// func rpc_discover_ips(body io.Reader) []byte {
+// 	type MethodCall struct {
+// 		XMLName xml.Name `xml:"methodCall"`
+// 		Params []StringParam	`xml:"params>param"`
+// 	}
+// 	type Result struct {
+// 		XMLName   xml.Name `xml:"methodResponse"`
+// 		Param     string      `xml:"params>param>value>string"`
+// 	}
+// 	var myResult = "0.0.0.0"
 
-	v := MethodCall{Params: nil}
+// 	v := MethodCall{Params: nil}
 
-    decoder := xml.NewDecoder(body)
-    decoder.CharsetReader = charset.NewReaderLabel
-    err := decoder.Decode(&v)
+//     decoder := xml.NewDecoder(body)
+//     decoder.CharsetReader = charset.NewReaderLabel
+//     err := decoder.Decode(&v)
 	
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
+// 	if err != nil {
+// 		fmt.Printf("error: %v\n", err)
+// 	}
 
-	value, err := Decode(v.Params[0].Value)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-	fmt.Printf("discover IPS %s\n", value)
+// 	value, err := Decode(v.Params[0].Value)
+// 	if err != nil {
+// 		fmt.Printf("error: %v\n", err)
+// 	}
+// 	fmt.Printf("discover IPS %s\n", value)
 
-	xmlResult := &Result{Param: myResult}
+// 	xmlResult := &Result{Param: myResult}
 
-	enc, err := xml.MarshalIndent(xmlResult, "  ", "    ")
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
+// 	enc, err := xml.MarshalIndent(xmlResult, "  ", "    ")
+// 	if err != nil {
+// 		fmt.Printf("error: %v\n", err)
+// 	}
 
-	return enc
-}
+// 	return enc
+// }
 
 //NEEDS WORK
-func rpc_exec(body io.Reader) []byte {
-	type MethodCall struct {
-		XMLName xml.Name `xml:"methodCall"`
-		Params []StringParam	`xml:"params>param"`
-	}
-	type Result struct {
-		XMLName   xml.Name `xml:"methodResponse"`
-		Param     string      `xml:"params>param>value>string"`
-	}
-	var myResult = "foo"
+// func rpc_exec(body io.Reader) []byte {
+// 	type MethodCall struct {
+// 		XMLName xml.Name `xml:"methodCall"`
+// 		Params []StringParam	`xml:"params>param"`
+// 	}
+// 	type Result struct {
+// 		XMLName   xml.Name `xml:"methodResponse"`
+// 		Param     string      `xml:"params>param>value>string"`
+// 	}
+// 	var myResult = "foo"
 
-	v := MethodCall{Params: nil}
+// 	v := MethodCall{Params: nil}
 
-    decoder := xml.NewDecoder(body)
-    decoder.CharsetReader = charset.NewReaderLabel
-    err := decoder.Decode(&v)
-	fmt.Printf("decoded PARAMS %#v\n", v)
+//     decoder := xml.NewDecoder(body)
+//     decoder.CharsetReader = charset.NewReaderLabel
+//     err := decoder.Decode(&v)
+// 	fmt.Printf("decoded PARAMS %#v\n", v)
 	
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
+// 	if err != nil {
+// 		fmt.Printf("error: %v\n", err)
+// 	}
 
-	// Decode Param 1
-	value1, err := Decode(v.Params[0].Value)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-	fmt.Printf("value1 %s\n", value1)
+// 	// Decode Param 1
+// 	value1, err := Decode(v.Params[0].Value)
+// 	if err != nil {
+// 		fmt.Printf("error: %v\n", err)
+// 	}
+// 	fmt.Printf("value1 %s\n", value1)
 
-	// Decode Param 2
-	value2, err := Decode(v.Params[1].Value)
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-	fmt.Printf("value2 %s\n", value2)
+// 	// Decode Param 2
+// 	value2, err := Decode(v.Params[1].Value)
+// 	if err != nil {
+// 		fmt.Printf("error: %v\n", err)
+// 	}
+// 	fmt.Printf("value2 %s\n", value2)
 
-	execArgs := strings.Split(value1, " ") // Convert func+args into an array
-	functionName := execArgs[0]
-	execArgs = append(execArgs[:0], execArgs[0+1:]...) // remove the function name from the args list
-	functionArgs := strings.Join(execArgs, " ")
+// 	execArgs := strings.Split(value1, " ") // Convert func+args into an array
+// 	functionName := execArgs[0]
+// 	execArgs = append(execArgs[:0], execArgs[0+1:]...) // remove the function name from the args list
+// 	functionArgs := strings.Join(execArgs, " ")
 
-	fmt.Printf("functionName: %v\n", functionName)
-	fmt.Printf("functionArgs: %v\n", functionArgs)
+// 	fmt.Printf("functionName: %v\n", functionName)
+// 	fmt.Printf("functionArgs: %v\n", functionArgs)
 
-    cmd1 := exec.Command(functionName, functionArgs)
-    out, err := cmd1.CombinedOutput()
-    if err != nil {
-        log.Fatalf("cmd.Run() failed with %s\n", err)
-    }
-    // fmt.Printf("combined out:\n%s\n", string(out))
+//     cmd1 := exec.Command(functionName, functionArgs)
+//     out, err := cmd1.CombinedOutput()
+//     if err != nil {
+//         log.Fatalf("cmd.Run() failed with %s\n", err)
+//     }
+//     // fmt.Printf("combined out:\n%s\n", string(out))
 
-	myResult = string(out)
+// 	myResult = string(out)
 
-	myEncodedResult, err := Encode(myResult)
+// 	myEncodedResult, err := Encode(myResult)
 
-	anotherResult := fmt.Sprintf("1;%v", myEncodedResult)
+// 	anotherResult := fmt.Sprintf("1;%v", myEncodedResult)
 
-	xmlResult := &Result{Param: anotherResult}
+// 	xmlResult := &Result{Param: anotherResult}
 
-	fmt.Printf("encodedResult: %v\n", xmlResult)
+// 	fmt.Printf("encodedResult: %v\n", xmlResult)
 
-	enc, err := xml.MarshalIndent(xmlResult, "  ", "    ")
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
+// 	enc, err := xml.MarshalIndent(xmlResult, "  ", "    ")
+// 	if err != nil {
+// 		fmt.Printf("error: %v\n", err)
+// 	}
 
-	// successfulReturn := []byte("1;")
-	// append(s1, 3, 5, 7)
+// 	// successfulReturn := []byte("1;")
+// 	// append(s1, 3, 5, 7)
 
-	// TODO: This doesn't seem to be working... Will need to rebug on the PHP side
-	// return append([]byte("1;"), enc...)
-	return enc
+// 	// TODO: This doesn't seem to be working... Will need to rebug on the PHP side
+// 	// return append([]byte("1;"), enc...)
+// 	return enc
 
-	// return append(successfulReturn[:], enc[:])
-	// return fmt.Sprintf("%s%s", "1;", enc)
-}
+// 	// return append(successfulReturn[:], enc[:])
+// 	// return fmt.Sprintf("%s%s", "1;", enc)
+// }
 
 // POC
 func rpc_ftp_mgr(body io.Reader) []byte {
@@ -917,7 +916,111 @@ func rpc_writefile(body io.Reader) []byte {
 }
 
 
-func Handler(w http.ResponseWriter, r *http.Request) {
+
+
+type AgentService struct{}
+
+func (agent *AgentService) Quick_chk(r *http.Request, args *struct{test string}, reply *struct{Message int}) error {
+	fmt.Println("quick_chk CALLED")
+	var myResult = 0
+
+	err := Decode2(&args.test)
+	if err != nil {
+		fmt.Printf("Error decoding: %v\n", err)
+		myResult = 1
+	}
+
+	reply.Message = myResult
+	
+	fmt.Printf("decoded Arg: %v\n", args.test)
+	fmt.Printf("reply.Message: %v\n", reply.Message)
+    return nil
+}
+
+func (agent *AgentService) What_os(r *http.Request, args *struct{test string}, reply *struct{Message string}) error {
+	fmt.Println("What_os CALLED")
+	var myResult = "1; Linux x86_64"
+
+	err := Decode2(&args.test)
+	if err != nil {
+		fmt.Printf("Error decoding: %v\n", err)
+	}
+
+	reply.Message = myResult
+	
+	fmt.Printf("decoded Arg: %v\n", args.test)
+	fmt.Printf("reply.Message: %v\n", reply.Message)
+    return nil
+}
+
+func (agent *AgentService) Discover_ips(r *http.Request, args *struct{test string}, reply *struct{Message string}) error {
+	fmt.Println("Discover_ips CALLED")
+	var myResult = "0.0.0.0"
+
+	err := Decode2(&args.test)
+	if err != nil {
+		fmt.Printf("Error decoding: %v\n", err)
+	}
+
+	reply.Message = myResult
+	
+	fmt.Printf("decoded Arg: %v\n", args.test)
+	fmt.Printf("reply.Message: %v\n", reply.Message)
+    return nil
+}
+
+func (agent *AgentService) Cpu_count(r *http.Request, args *struct{test string}, reply *struct{Message int}) error {
+	fmt.Println("Cpu_count CALLED")
+	var myResult = 1
+
+	err := Decode2(&args.test)
+	if err != nil {
+		fmt.Printf("Error decoding: %v\n", err)
+	}
+
+	reply.Message = myResult
+	
+	fmt.Printf("decoded Arg: %v\n", args.test)
+	fmt.Printf("reply.Message: %v\n", reply.Message)
+    return nil
+}
+
+func (agent *AgentService) Exec(r *http.Request, args *struct{test string }, reply *struct{Message string}) error {
+	fmt.Println("Exec CALLED")
+	var myResult = "foo"
+
+	err := Decode2(&args.test)
+	if err != nil {
+		fmt.Printf("Error decoding: %v\n", err)
+	}
+
+
+//     cmd1 := exec.Command(functionName, functionArgs)
+//     out, err := cmd1.CombinedOutput()
+//     if err != nil {
+//         log.Fatalf("cmd.Run() failed with %s\n", err)
+//     }
+//     // fmt.Printf("combined out:\n%s\n", string(out))
+
+// 	myResult = string(out)
+
+	myEncodedResult, err := Encode(myResult)
+
+// 	anotherResult := fmt.Sprintf("1;%v", myEncodedResult)
+
+
+	reply.Message = fmt.Sprintf("1;%v", myEncodedResult)
+	
+	fmt.Printf("decoded Arg: %v\n", args.test)
+	fmt.Printf("reply.Message: %v\n\n\n", reply.Message)
+    return nil
+}
+
+
+
+
+
+func HttpHandler(w http.ResponseWriter, r *http.Request) {
     type MethodCall struct {
 		XMLName xml.Name `xml:"methodCall"`
 		MethodName string	`xml:"methodName"`
@@ -930,7 +1033,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	// Decode Method
     decoder := xml.NewDecoder(bytes.NewReader(Body))
     decoder.CharsetReader = charset.NewReaderLabel
-    err := decoder.Decode(&v)
+	err := decoder.Decode(&v)
 	fmt.Printf("decoded %s\n", v)
 	
 	if err != nil {
@@ -945,18 +1048,18 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	// fmt.Printf("MethodName %s Being Called \n Body: %s", v.MethodName, Body)
 
 	switch v.MethodName {
-    case "quick_chk":
-		w.Write(quick_chk(bytes.NewReader(Body)))
-	case "exec":
-		w.Write(rpc_exec(bytes.NewReader(Body)))
-	case "what_os":
-		w.Write(what_os(bytes.NewReader(Body)))
-	case "discover_ips":
-		w.Write(rpc_discover_ips(bytes.NewReader(Body)))
+    // case "quick_chk":
+	// 	w.Write(quick_chk(bytes.NewReader(Body)))
+	// case "exec":
+	// 	w.Write(rpc_exec(bytes.NewReader(Body)))
+	// case "what_os":
+	// 	w.Write(what_os(bytes.NewReader(Body)))
+	// case "discover_ips":
+	// 	w.Write(discover_ips(bytes.NewReader(Body)))
 	case "ftp_mgr":
 		w.Write(rpc_ftp_mgr(bytes.NewReader(Body)))
-	case "cpu_count":
-		w.Write(cpu_count(bytes.NewReader(Body)))
+	// case "cpu_count":
+	// 	w.Write(cpu_count(bytes.NewReader(Body)))
 	case "is_screen_running":
 		w.Write(rpc_is_screen_running(bytes.NewReader(Body)))
 	case "rfile_exists":

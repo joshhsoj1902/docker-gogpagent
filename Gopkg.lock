@@ -2,10 +2,31 @@
 
 
 [[projects]]
+  branch = "master"
+  name = "github.com/divan/gorilla-xmlrpc"
+  packages = ["xml"]
+  revision = "706499c05b3e4047069f120794be0f56a5bf8ef9"
+
+[[projects]]
   name = "github.com/gorilla/handlers"
   packages = ["."]
   revision = "90663712d74cb411cbef281bc1e08c19d1a76145"
   version = "v1.3.0"
+
+[[projects]]
+  name = "github.com/gorilla/rpc"
+  packages = ["."]
+  revision = "22c016f3df3febe0c1f6727598b6389507e03a18"
+  version = "v1.1.0"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/rogpeppe/go-charset"
+  packages = [
+    "charset",
+    "data"
+  ]
+  revision = "2471d30d28b404738b546df7aaa82c45826bc02e"
 
 [[projects]]
   branch = "master"
@@ -50,6 +71,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "1f97e57016fc906859ca99b8dacf5243db5d2344a51050cf47920c2924a7654d"
+  inputs-digest = "7c726cf3a3a365ac6c8677e414bb9076a60a6f96c9ce962da5cb2fb0c22d2b87"
   solver-name = "gps-cdcl"
   solver-version = 1
