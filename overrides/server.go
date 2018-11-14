@@ -10,6 +10,10 @@ import (
 	"strings"
 	// "io/ioutil"
 	"net/http"
+	"bytes"
+	"io"
+	"io/ioutil"
+
 
 	"github.com/gorilla/rpc"
 	"golang.org/x/net/html/charset"
@@ -58,21 +62,47 @@ func (c *Codec) RegisterAlias(alias, method string) {
 
 // NewRequest returns a CodecRequest.
 func (c *Codec) NewRequest(r *http.Request) rpc.CodecRequest {
+	var buf bytes.Buffer
 	var request ServerRequest
-	decoder := xml.NewDecoder(r.Body)
+	decoder := xml.NewDecoder(io.TeeReader(r.Body, &buf))
     decoder.CharsetReader = charset.NewReaderLabel
 	err := decoder.Decode(&request)
 
 	if err != nil {
 		return &CodecRequest{err: err}
 	}
-	request.rawxml = string("Placeholder")
+
+	rawxml, _ := ioutil.ReadAll(&buf)
+	
+	request.rawxml = string(rawxml)
 	if method, ok := c.aliases[request.Method]; ok {
 		request.Method = method
 	}
 
 	request.Method = "agent." + strings.Title(request.Method)
-	fmt.Printf("--- THE REQUEST2: %+v\n",request)
+
+	switch request.Method {
+	case 	"agent.Discover_ips", 
+			"agent.What_os", 
+			"agent.Quick_chk",
+			"agent.Ftp_mgr",
+			"agent.Cpu_count",
+			"agent.Rfile_exists",
+			"agent.Stop_server",
+			"agent.Restart_server",
+			"agent.Universal_start",
+			"agent.Readfile",
+			"agent.Writefile",
+			"agent.Get_log",
+			"agent.Steam_cmd",
+			"agent.Dirlist",
+			"agent.Is_screen_running":
+		// fmt.Printf("--- THE REQUEST2: %+v\n",request)
+	default: 
+		fmt.Printf("--- THE REQUEST2: %+v\n",request)
+
+	}
+
 
 	return &CodecRequest{request: &request}
 }
@@ -108,9 +138,7 @@ func (c *CodecRequest) Method() (string, error) {
 // args is the pointer to the Service.Args structure
 // it gets populated from temporary XML structure
 func (c *CodecRequest) ReadRequest(args interface{}) error {
-	fmt.Printf("ReadRequest1: %+v\n",c.err)
-	// c.err = xml2RPC(c.request.rawxml, args)
-
+	c.err = xml2RPC(c.request.rawxml, args)
 	return nil
 }
 

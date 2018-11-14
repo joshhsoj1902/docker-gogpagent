@@ -192,10 +192,10 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Get service method to be called.
 	method, errMethod := codecReq.Method()
 	fmt.Printf("====================\nMethod: %+v\n====================\n",method)
-	fmt.Printf("errMethod: %+v\n",errMethod)
 
 	if errMethod != nil {
 		// fmt.Println("INSIDE ServeHTTP 3")
+		fmt.Printf("errMethod: %+v\n",errMethod)
 
 		s.writeError(w, 400, errMethod.Error())
 		return

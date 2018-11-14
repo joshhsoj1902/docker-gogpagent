@@ -8,6 +8,7 @@ import (
 	"github.com/xxtea/xxtea-go/xxtea"
     "os"
 	"reflect"
+	"strings"
 
 	"golang.org/x/net/html/charset"
 )
@@ -18,6 +19,11 @@ type GenericMethodCall struct {
 }
 
 func Decode2 (src *string) error {
+	if strings.Contains(*src, "<string/>") {
+		*src = ""
+		return nil
+	}
+
 	// Decode and Decrypt params
 	decodeData1, err := base64.StdEncoding.DecodeString(*src)
 	if err != nil {
