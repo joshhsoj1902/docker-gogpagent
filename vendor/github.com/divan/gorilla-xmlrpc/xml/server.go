@@ -7,12 +7,10 @@ package xml
 import (
 	"encoding/xml"
 	"fmt"
-	// "io/ioutil"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/gorilla/rpc"
-	"golang.org/x/net/html/charset"
-
 )
 
 // ----------------------------------------------------------------------------
@@ -37,35 +35,18 @@ func (c *Codec) RegisterAlias(alias, method string) {
 }
 
 // NewRequest returns a CodecRequest.
-// func (c *Codec) NewRequest(r *http.Request) rpc.CodecRequest {
-// 	rawxml, err := ioutil.ReadAll(r.Body)
-// 	if err != nil {
-// 		return &CodecRequest{err: err}
-// 	}
-// 	defer r.Body.Close()
-
-// 	var request ServerRequest
-// 	if err := xml.Unmarshal(rawxml, &request); err != nil {
-// 		return &CodecRequest{err: err}
-// 	}
-// 	request.rawxml = string(rawxml)
-// 	if method, ok := c.aliases[request.Method]; ok {
-// 		request.Method = method
-// 	}
-// 	return &CodecRequest{request: &request}
-// }
-
-// NewRequest returns a CodecRequest.
 func (c *Codec) NewRequest(r *http.Request) rpc.CodecRequest {
-	var request ServerRequest
-	decoder := xml.NewDecoder(r.Body)
-    decoder.CharsetReader = charset.NewReaderLabel
-	err := decoder.Decode(&request)
-
+	rawxml, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		return &CodecRequest{err: err}
 	}
-	request.rawxml = string("Placeholder")
+	defer r.Body.Close()
+
+	var request ServerRequest
+	if err := xml.Unmarshal(rawxml, &request); err != nil {
+		return &CodecRequest{err: err}
+	}
+	request.rawxml = string(rawxml)
 	if method, ok := c.aliases[request.Method]; ok {
 		request.Method = method
 	}

@@ -59,10 +59,6 @@ func (m *serviceMap) register(rcvr interface{}, name string, passReq bool) error
 		methods:  make(map[string]*serviceMethod),
 		passReq:  passReq,
 	}
-	fmt.Printf("INSIDE REGESTER mehod: %+v\n",name)
-
-
-
 	if name == "" {
 		s.name = reflect.Indirect(s.rcvr).Type().Name()
 		if !isExported(s.name) {
@@ -75,8 +71,6 @@ func (m *serviceMap) register(rcvr interface{}, name string, passReq bool) error
 	}
 	// Setup methods.
 	for i := 0; i < s.rcvrType.NumMethod(); i++ {
-	   fmt.Printf("REGESTER mehod loop: %+v\n",s.rcvrType.Method(i).Name)
-
 		method := s.rcvrType.Method(i)
 		mtype := method.Type
 
@@ -123,8 +117,6 @@ func (m *serviceMap) register(rcvr interface{}, name string, passReq bool) error
 		if returnType := mtype.Out(0); returnType != typeOfError {
 			continue
 		}
-		// fmt.Printf("REGESTER mehod end of loop: %+v\n",s.rcvrType.Method(i))
-
 		s.methods[method.Name] = &serviceMethod{
 			method:    method,
 			argsType:  args.Elem(),
@@ -150,13 +142,12 @@ func (m *serviceMap) register(rcvr interface{}, name string, passReq bool) error
 // get returns a registered service given a method name.
 //
 // The method name uses a dotted notation as in "Service.Method".
-func (m *serviceMap) get(method string) (*service, *serviceMethod, error) {	
+func (m *serviceMap) get(method string) (*service, *serviceMethod, error) {
 	parts := strings.Split(method, ".")
 	if len(parts) != 2 {
 		err := fmt.Errorf("rpc: service/method request ill-formed: %q", method)
 		return nil, nil, err
 	}
-
 	m.mutex.Lock()
 	service := m.services[parts[0]]
 	m.mutex.Unlock()

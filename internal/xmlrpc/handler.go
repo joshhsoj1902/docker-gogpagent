@@ -1,25 +1,21 @@
 package xmlrpc
 
 import (
-	// "io"
-    // "log"
     "fmt"
     "net/http"
-	"encoding/xml"
 	"encoding/base64"
-	"bytes"
-	// "strings"
 
-	"golang.org/x/net/html/charset"
+    "github.com/joshhsoj1902/docker-gogpagent/internal/dockerswarm"
 
-	"io/ioutil"
 )
 
-type StringParam struct {
-	Value string `xml:"value>string"`
+type AgentService struct{
+	Docker dockerswarm.Dockerswarm
 }
 
-type AgentService struct{}
+func NewAgentService(docker dockerswarm.Dockerswarm) AgentService {
+	return AgentService{Docker: docker}
+}
 
 // Working
 func (agent *AgentService) Quick_chk(r *http.Request, args *struct{Arg1 string}, reply *struct{Message int}) error {
@@ -647,38 +643,4 @@ func (agent *AgentService) Steam_cmd(r *http.Request, args *struct{Arg1 string;A
 
 	fmt.Printf("reply.Message: %v\n", reply.Message)
     return nil
-}
-
-func HttpHandler(w http.ResponseWriter, r *http.Request) {
-    type MethodCall struct {
-		XMLName xml.Name `xml:"methodCall"`
-		MethodName string	`xml:"methodName"`
-	}
-
-	Body, _ := ioutil.ReadAll(r.Body);
-
-	v := MethodCall{MethodName: ""}
-
-	// Decode Method
-    decoder := xml.NewDecoder(bytes.NewReader(Body))
-    decoder.CharsetReader = charset.NewReaderLabel
-	err := decoder.Decode(&v)
-	fmt.Printf("decoded %s\n", v)
-	
-	if err != nil {
-		fmt.Printf("error: %v\n", err)
-	}
-
-    fmt.Printf("RPC MethodName %s\n", v.MethodName)
-    // fmt.Printf("BODY %s\n\n\n", Body)
-
-	// w.Header().Set("content-type", "application/xml")
-
-	// fmt.Printf("MethodName %s Being Called \n Body: %s", v.MethodName, Body)
-
-	switch v.MethodName {
-
-	default:
-		fmt.Printf("MethodName %s NOT SUPPORTED \n Body: %s", v.MethodName, Body)
-    }
 }

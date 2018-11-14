@@ -7,9 +7,9 @@ import (
     "net/http"
 
     "github.com/joshhsoj1902/docker-gogpagent/internal/xmlrpc"
+    "github.com/joshhsoj1902/docker-gogpagent/internal/dockerswarm"
     "github.com/gorilla/rpc"
     "github.com/divan/gorilla-xmlrpc/xml"
-
 )
 func RpcHandler() {
 
@@ -21,11 +21,14 @@ func RpcHandler() {
 func main() {
     log.Println("STARTING Agent")
 
+    docker := dockerswarm.NewBackend()
+    agentService := xmlrpc.NewAgentService(docker)
+
     RPC := rpc.NewServer()
     xmlrpcCodec := xml.NewCodec()
     
     RPC.RegisterCodec(xmlrpcCodec, "text/xml")
-    RPC.RegisterService(new(xmlrpc.AgentService), "agent")
+    RPC.RegisterService(&agentService, "agent")
     http.Handle("/RPC2", RPC)
 
 

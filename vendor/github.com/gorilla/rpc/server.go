@@ -88,13 +88,7 @@ func (s *Server) RegisterCodec(codec Codec, contentType string) {
 //
 // All other methods are ignored.
 func (s *Server) RegisterService(receiver interface{}, name string) error {
-	fmt.Printf("Name being registered: %+v\n",name)
-	err := s.services.register(receiver, name, true)
-	if err != nil {
-		fmt.Printf("Name being registered returned ERROR: %+v\n",err)
-	}
-
-	return err
+	return s.services.register(receiver, name, true)
 }
 
 // RegisterTCPService adds a new TCP service to the server.
@@ -158,17 +152,10 @@ func (s *Server) RegisterAfterFunc(f func(i *RequestInfo)) {
 
 // ServeHTTP
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-    fmt.Println("")
-    fmt.Println("")
-    fmt.Println("")
-    fmt.Println("")
-    fmt.Println("INSIDE ServeHTTP 1")
-
 	if r.Method != "POST" {
 		s.writeError(w, 405, "rpc: POST method required, received "+r.Method)
 		return
 	}
-
 	contentType := r.Header.Get("Content-Type")
 	idx := strings.Index(contentType, ";")
 	if idx != -1 {
@@ -185,36 +172,22 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		s.writeError(w, 415, "rpc: unrecognized Content-Type: "+contentType)
 		return
 	}
-    // fmt.Println("INSIDE ServeHTTP 2")
-
 	// Create a new codec request.
 	codecReq := codec.NewRequest(r)
 	// Get service method to be called.
 	method, errMethod := codecReq.Method()
-	fmt.Printf("====================\nMethod: %+v\n====================\n",method)
-
 	if errMethod != nil {
-		// fmt.Println("INSIDE ServeHTTP 3")
-		fmt.Printf("errMethod: %+v\n",errMethod)
-
 		s.writeError(w, 400, errMethod.Error())
 		return
 	}
 	serviceSpec, methodSpec, errGet := s.services.get(method)
-	// fmt.Printf("serviceSpec: %+v\n",serviceSpec)
-	// fmt.Printf("methodSpec: %+v\n",methodSpec)
-	// fmt.Printf("errGet: %+v\n",errGet)
 	if errGet != nil {
-		// fmt.Println("INSIDE ServeHTTP 4")
-
 		s.writeError(w, 400, errGet.Error())
 		return
 	}
 	// Decode the args.
 	args := reflect.New(methodSpec.argsType)
 	if errRead := codecReq.ReadRequest(args.Interface()); errRead != nil {
-		// fmt.Println("INSIDE ServeHTTP 5")
-
 		s.writeError(w, 400, errRead.Error())
 		return
 	}
@@ -237,8 +210,6 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-    // fmt.Println("INSIDE ServeHTTP 6")
-
 	// Call the service method.
 	reply := reflect.New(methodSpec.replyType)
 
@@ -257,44 +228,24 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			args,
 			reply,
 		})
-
 	}
-
-    // fmt.Println("INSIDE ServeHTTP 7")
-
 
 	// Cast the result to error if needed.
 	var errResult error
 	errInter := errValue[0].Interface()
-	fmt.Printf("errResult: %+v\n",errResult)
-
 	if errInter != nil {
-		// fmt.Println("INSIDE ServeHTTP 8")
-
 		errResult = errInter.(error)
 	}
-    // fmt.Println("INSIDE ServeHTTP 9")
-
-	fmt.Printf("reply: %+v\n",reply)
-
 
 	// Prevents Internet Explorer from MIME-sniffing a response away
 	// from the declared content-type
 	w.Header().Set("x-content-type-options", "nosniff")
 	// Encode the response.
 	if errWrite := codecReq.WriteResponse(w, reply.Interface(), errResult); errWrite != nil {
-		// fmt.Println("INSIDE ServeHTTP 10")
-		// fmt.Printf("errWrite: %+v\n",errWrite)
-
-
 		s.writeError(w, 400, errWrite.Error())
 	} else {
-		// fmt.Println("INSIDE ServeHTTP 11")
-
 		// Call the registered After Function
 		if s.afterFunc != nil {
-		// fmt.Println("INSIDE ServeHTTP 12")
-
 			s.afterFunc(&RequestInfo{
 				Request:    r,
 				Method:     method,
@@ -303,8 +254,6 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			})
 		}
 	}
-    // fmt.Println("INSIDE ServeHTTP 13")
-
 }
 
 func (s *Server) writeError(w http.ResponseWriter, status int, msg string) {

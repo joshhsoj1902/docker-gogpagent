@@ -49,42 +49,30 @@ type member struct {
 }
 
 func xml2RPC(xmlraw string, rpc interface{}) error {
-	// fmt.Println("Inside xml2RPC")
-
 	// Unmarshal raw XML into the temporal structure
 	var ret response
 	decoder := xml.NewDecoder(bytes.NewReader([]byte(xmlraw)))
 	decoder.CharsetReader = charset.NewReader
 	err := decoder.Decode(&ret)
 	if err != nil {
-		// fmt.Printf("xml2RPC step 1: %+v\n", err)
 		return FaultDecode
 	}
 
 	if !ret.Fault.IsEmpty() {
-		// fmt.Println("xml2RPC step 2 ")
 		return getFaultResponse(ret.Fault)
 	}
 
 	// Structures should have equal number of fields
 	if reflect.TypeOf(rpc).Elem().NumField() != len(ret.Params) {
-		// fmt.Println("xml2RPC step 3 ")
 		return FaultWrongArgumentsNumber
 	}
 
 	// Now, convert temporal structure into the
 	// passed rpc variable, according to it's structure
 	for i, param := range ret.Params {
-		// fmt.Printf("xml2RPC step 4.1: %+v\n", param)
 		field := reflect.ValueOf(rpc).Elem().Field(i)
-		// fmt.Printf("xml2RPC step 4.2: %+v\n", field)
-
 		err = value2Field(param.Value, &field)
-		// fmt.Printf("xml2RPC step 4.3: %+v\n", &field)
-
 		if err != nil {
-			// fmt.Printf("xml2RPC step 4.4: %+v\n", err)
-
 			return err
 		}
 	}
@@ -114,14 +102,7 @@ func getFaultResponse(fault faultValue) Fault {
 }
 
 func value2Field(value value, field *reflect.Value) error {
-	// fmt.Println("inside value2Field Step 1")
-	// fmt.Printf("value: %s\n", value)
-	// fmt.Printf("field: %s\n", field)
-
-
 	if !field.CanSet() {
-		// fmt.Println("inside value2Field Step 2")
-
 		return FaultApplicationError
 	}
 

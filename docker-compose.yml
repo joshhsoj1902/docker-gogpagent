@@ -35,8 +35,8 @@ services:
     image: joshhsoj1902/docker-gogpagent:latest
     ports:
      - "12679:12679"
-    # volumes:
-    #   - /var/run/docker.sock:/var/run/docker.sock
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - OGP_LISTEN_PORT=12679
       - OGP_KEY=encryption_key2
