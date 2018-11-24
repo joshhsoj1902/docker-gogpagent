@@ -52,3 +52,6 @@
 [[override]]
   name = "github.com/docker/libnetwork"
   branch = "master"
+[[constraint]]
+  branch = "v1"
+  name = "gopkg.in/yaml.v1"

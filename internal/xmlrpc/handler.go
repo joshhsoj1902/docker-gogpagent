@@ -4,8 +4,13 @@ import (
     "fmt"
     "net/http"
 	"encoding/base64"
+    "io/ioutil"
+	"path/filepath"
+	"os"
 
-    "github.com/joshhsoj1902/docker-gogpagent/internal/dockerswarm"
+	"github.com/joshhsoj1902/docker-gogpagent/internal/dockerswarm"
+	"github.com/docker/docker/api/types/swarm"
+	
 
 )
 
@@ -226,7 +231,7 @@ func (agent *AgentService) Lock_additional_files(r *http.Request, args *struct{A
 /// \return 1 If is
 /// \return 0 If is not
 /// \return -1 If agent could not be reached.
-func (agent *AgentService) Is_screen_running(r *http.Request, args *struct{Arg1 string;Arg2 string;EncryptionCheck string}, reply *struct{Message int}) error {
+func (agent *AgentService) Is_screen_running(r *http.Request, args *struct{Arg1 string;GameId string;EncryptionCheck string}, reply *struct{Message int}) error {
 	fmt.Println("==== Is_screen_running ====")
 	// var myResult = 1
 	var myResult = 0
@@ -235,7 +240,7 @@ func (agent *AgentService) Is_screen_running(r *http.Request, args *struct{Arg1 
 		fmt.Printf("Error decoding: %v\n", err)
 	}
 
-	if err := Decode2(&args.Arg2); err != nil {
+	if err := Decode2(&args.GameId); err != nil {
 		fmt.Printf("Error decoding: %v\n", err)
 	}
 
@@ -243,10 +248,17 @@ func (agent *AgentService) Is_screen_running(r *http.Request, args *struct{Arg1 
 		fmt.Printf("Error decoding: %v\n", err)
 	}
 
+	if agent.Docker.IsRunning(GenerateServiceName(args.GameId)) {
+		myResult = 1
+	} else {
+		myResult = 0
+	}
+
+
 	reply.Message = myResult
 	
 	fmt.Printf(">> decoded Arg1: %v\n", args.Arg1)
-	fmt.Printf(">> decoded Arg2: %v\n", args.Arg2)
+	fmt.Printf(">> decoded GameId: %v\n", args.GameId)
 	fmt.Printf(">> decoded EncryptionCheck: %v\n", args.EncryptionCheck)
 	fmt.Printf("reply.Message: %v\n", reply.Message)
     return nil
@@ -292,11 +304,11 @@ func (agent *AgentService) Start_server(r *http.Request, args *struct{Arg1 strin
 }
 
 
-func (agent *AgentService) Universal_start(r *http.Request, args *struct{Arg1 string;Arg2 string;Arg3 string;Arg4 string;Arg5 string;Port string;IP string;Arg8 string;Arg9 string;Arg10 string;Arg11 string;Arg12 string;EncryptionCheck string}, reply *struct{Message int}) error {
+func (agent *AgentService) Universal_start(r *http.Request, args *struct{GameId string;Arg2 string;Arg3 string;Arg4 string;Arg5 string;Port string;IP string;Arg8 string;Arg9 string;Arg10 string;Arg11 string;EncryptionCheck string}, reply *struct{Message int}) error {
 	fmt.Println("==== Universal_start ====")
 	var myResult = 1
 
-	if err := Decode2(&args.Arg1); err != nil {
+	if err := Decode2(&args.GameId); err != nil {
 		fmt.Printf("Error decoding: %v\n", err)
 	}
 	if err := Decode2(&args.Arg2); err != nil {
@@ -329,17 +341,13 @@ func (agent *AgentService) Universal_start(r *http.Request, args *struct{Arg1 st
 	if err := Decode2(&args.Arg11); err != nil {
 		fmt.Printf("Error decoding: %v\n", err)
 	}
-	if err := Decode2(&args.Arg12); err != nil {
-		fmt.Printf("Error decoding: %v\n", err)
-	}
 	if err := Decode2(&args.EncryptionCheck); err != nil {
 		fmt.Printf("Error decoding: %v\n", err)
 	}
 
-
 	reply.Message = myResult
 	
-	fmt.Printf(">> decoded Arg1: %v\n", args.Arg1)
+	fmt.Printf(">> decoded GameId: %v\n", args.GameId)
 	fmt.Printf(">> decoded Arg2: %v\n", args.Arg2)
 	fmt.Printf(">> decoded Arg3: %v\n", args.Arg3)
 	fmt.Printf(">> decoded Arg4: %v\n", args.Arg4)
@@ -350,9 +358,46 @@ func (agent *AgentService) Universal_start(r *http.Request, args *struct{Arg1 st
 	fmt.Printf(">> decoded Arg9: %v\n", args.Arg9)
 	fmt.Printf(">> decoded Arg10: %v\n", args.Arg10)
 	fmt.Printf(">> decoded Arg11: %v\n", args.Arg11)
-	fmt.Printf(">> decoded Arg12: %v\n", args.Arg12)
 	fmt.Printf(">> decoded EncryptionCheck: %v\n", args.EncryptionCheck)
 	fmt.Printf("reply.Message: %v\n", reply.Message)
+
+	dockerConfig, err := ParseConfigYaml(args.Arg2 + "/docker-config.yml")
+	if err != nil {
+		fmt.Printf("Error ParseConfigYaml: %v\n", err)
+	}
+
+	dockerEnv, err := ParseEnvYaml(args.Arg2 + "/docker-environment.yml")
+	if err != nil {
+		fmt.Printf("Error ParseEnvYaml: %v\n", err)
+	}
+
+	ports := []swarm.PortConfig{
+		swarm.PortConfig{
+			Protocol: "tcp",
+			TargetPort: dockerConfig.Port,
+			PublishedPort: dockerConfig.Port,
+		},
+		swarm.PortConfig{
+			Protocol: "udp",
+			TargetPort: dockerConfig.Port,
+			PublishedPort: dockerConfig.Port,
+		},
+	}
+
+	dockerServiceConfig := dockerswarm.Config{
+		Name: GenerateServiceName(args.GameId),
+		Namespace: dockerConfig.Namespace,
+		Image: dockerConfig.Image,
+		Envs: dockerEnv,
+		Ports: ports,
+	}
+
+	agent.Docker.Start(dockerServiceConfig)
+
+
+	fmt.Printf("Done start: %v\n", "yay")
+
+
     return nil
 }
 
@@ -432,17 +477,17 @@ func (agent *AgentService) Restart_server(r *http.Request, args *struct{Arg1 str
     return nil
 }
 
-func (agent *AgentService) Stop_server(r *http.Request, args *struct{Arg1 string;Arg2 string;Arg3 string;Arg4 string;Arg5 string;Arg6 string;Arg7 string}, reply *struct{Message int}) error {
+func (agent *AgentService) Stop_server(r *http.Request, args *struct{GameId string;IP string;Port string;Arg4 string;Arg5 string;Arg6 string;Arg7 string; EncryptionCheck string}, reply *struct{Message int}) error {
 	fmt.Println("==== Stop_server ====")
 	var myResult = 1
 
-	if err := Decode2(&args.Arg1); err != nil {
+	if err := Decode2(&args.GameId); err != nil {
 		fmt.Printf("Error decoding: %v\n", err)
 	}
-	if err := Decode2(&args.Arg2); err != nil {
+	if err := Decode2(&args.IP); err != nil {
 		fmt.Printf("Error decoding: %v\n", err)
 	}
-	if err := Decode2(&args.Arg3); err != nil {
+	if err := Decode2(&args.Port); err != nil {
 		fmt.Printf("Error decoding: %v\n", err)
 	}
 	if err := Decode2(&args.Arg4); err != nil {
@@ -457,16 +502,22 @@ func (agent *AgentService) Stop_server(r *http.Request, args *struct{Arg1 string
 	if err := Decode2(&args.Arg7); err != nil {
 		fmt.Printf("Error decoding: %v\n", err)
 	}
+	if err := Decode2(&args.EncryptionCheck); err != nil {
+		fmt.Printf("Error decoding: %v\n", err)
+	}
+
+	agent.Docker.Stop(args.GameId)
 
 	reply.Message = myResult
 	
-	fmt.Printf(">> decoded Arg1: %v\n", args.Arg1)
-	fmt.Printf(">> decoded Arg2: %v\n", args.Arg2)
-	fmt.Printf(">> decoded Arg3: %v\n", args.Arg3)
+	fmt.Printf(">> decoded GameId: %v\n", args.GameId)
+	fmt.Printf(">> decoded IP: %v\n", args.IP)
+	fmt.Printf(">> decoded Port: %v\n", args.Port)
 	fmt.Printf(">> decoded Arg4: %v\n", args.Arg4)
 	fmt.Printf(">> decoded Arg5: %v\n", args.Arg5)
 	fmt.Printf(">> decoded Arg6: %v\n", args.Arg6)
 	fmt.Printf(">> decoded Arg7: %v\n", args.Arg7)
+	fmt.Printf(">> decoded EncryptionCheck: %v\n", args.EncryptionCheck)
 	fmt.Printf("reply.Message: %v\n", reply.Message)
     return nil
 }
@@ -556,6 +607,21 @@ func (agent *AgentService) Writefile(r *http.Request, args *struct{FilePath stri
 	}
 	if err := Decode2(&args.EncryptionCheck); err != nil {
 		fmt.Printf("Error decoding: %v\n", err)
+	}
+
+	if _, err := os.Stat(filepath.Dir(args.FilePath)); os.IsNotExist(err) {
+		fmt.Printf("Dir not found, CREATING: %v\n", filepath.Dir(args.FilePath))
+		if err := os.MkdirAll(filepath.Dir(args.FilePath), 0644); err != nil {
+			fmt.Printf("Error Creating Dir: %v\n", err)
+		}
+	}
+	fileContents, err := base64.StdEncoding.DecodeString(args.FileContents)
+	if err != nil {
+		fmt.Printf("Error decoding file contents: %+v\n", err)
+	}
+
+	if err := ioutil.WriteFile(args.FilePath, fileContents, 0644); err != nil {
+		fmt.Printf("Error Writing File: %v\n", err)
 	}
 
 	reply.Message = myResult
