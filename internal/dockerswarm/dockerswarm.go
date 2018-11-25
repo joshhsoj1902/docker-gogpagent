@@ -2,6 +2,8 @@ package dockerswarm
 
 import (
 	"fmt"
+	"io/ioutil"
+	"os"
 
 	"github.com/fsouza/go-dockerclient"
 	"github.com/docker/docker/api/types/swarm"
@@ -44,6 +46,48 @@ func NewBackend() Dockerswarm {
 	return Dockerswarm{Client: client}
 }
 
+// func (d Dockerswarm) getAuthConfigurations() docker.AuthConfigurations{
+
+// 	configs := docker.AuthConfigurations{}
+
+// 	gcloudFile := os.Getenv("OGP_GCLOUD_JSON")
+
+// 	if gcloudFile != "" {
+// 		gcloudJson, err := ioutil.ReadFile(gcloudFile)
+// 		if err != nil {
+// 			fmt.Printf("Error Reading Gcloud file %+v\n",err)
+// 		}
+
+// 		configs.Configs["gcloud"] = docker.AuthConfiguration{
+// 			Username: "_json_key",
+// 			Password: string(gcloudJson),
+// 			ServerAddress: "https://gcr.io",
+// 		}
+// 	}
+
+// 	return configs
+// }
+
+func (d Dockerswarm) getAuthConfiguration() docker.AuthConfiguration{
+
+	gcloudFile := os.Getenv("OGP_GCLOUD_JSON")
+
+	if gcloudFile != "" {
+		gcloudJson, err := ioutil.ReadFile(gcloudFile)
+		if err != nil {
+			fmt.Printf("Error Reading Gcloud file %+v\n",err)
+		}
+
+		return docker.AuthConfiguration{
+			Username: "_json_key",
+			Password: string(gcloudJson),
+			ServerAddress: "https://gcr.io",
+		}
+	}
+
+	return docker.AuthConfiguration{}
+}
+
 func (d Dockerswarm) Start(config Config) {
 	fmt.Println("Docker Starting!")
 
@@ -79,7 +123,7 @@ func (d Dockerswarm) Start(config Config) {
 	}
 	
 	serviceOpts := docker.CreateServiceOptions{
-		Auth: docker.AuthConfiguration{},
+		Auth: d.getAuthConfiguration(),
 		ServiceSpec: serviceSpec,
 	}
 

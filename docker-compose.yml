@@ -38,7 +38,9 @@ services:
      - "12679:12679"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - /home/josh/gcloud:/run/secrets/gcloud
     environment:
       - OGP_LISTEN_PORT=12679
       - OGP_KEY=encryption_key2
       - OGP_DOCKER_NAMESPACE=joshhsoj1902
+      - OGP_GCLOUD_JSON=/run/secrets/gcloud
