@@ -45,8 +45,12 @@ func NewBackend() Dockerswarm {
 }
 
 func (d Dockerswarm) Start(config Config) {
-
 	fmt.Println("Docker Starting!")
+
+	if d.DoesServiceExist(config.Name) {
+		d.scaleService(config.Name,uint64(1))
+		return
+	}
 
 	imagePath := config.Namespace +"/"+config.Image
 
@@ -79,18 +83,18 @@ func (d Dockerswarm) Start(config Config) {
 		ServiceSpec: serviceSpec,
 	}
 
-	swarmService, err := d.Client.CreateService(serviceOpts)
-
-
-	fmt.Printf("The swarm err %+v\n", err)
-	fmt.Printf("The swarm is awake %+v\n", swarmService)
-
+	_, err := d.Client.CreateService(serviceOpts)
+	if err != nil {
+		fmt.Printf("Error Creating service %+v\n",err)
+	}
 }
 
-
-// WIP
 func (d Dockerswarm) Stop(name string) {
+	fmt.Println("Docker Stopping!")
+	d.scaleService(name,uint64(0))
+}
 
+func (d Dockerswarm) scaleService(name string, replicas uint64) {
 	serviceId := d.getServiceId(name)
 
 	if serviceId == "" {
@@ -98,32 +102,21 @@ func (d Dockerswarm) Stop(name string) {
 		return
 	}
 
-	replicas := uint64(0)
-	version := uint64(1)
+	serviceDetails, err := d.Client.InspectService(serviceId)
 
-
-	// serviceDetails, err := d.Client.InspectService(serviceId)
-
-	// if err != nil {
-	// 	fmt.Printf("Error InspectService %+v\n",err)
-	// 	return
-	// }
-
-	// serviceSpec := serviceDetails.Spec
-	// serviceSpec.Mode.Replicated.Replicas = &replicas
-
-	serviceSpec := swarm.ServiceSpec{
-		Mode: swarm.ServiceMode{
-			Replicated: &swarm.ReplicatedService{
-				Replicas: &replicas,
-			},
-		},
+	if err != nil {
+		fmt.Printf("Error InspectService %+v\n",err)
+		return
 	}
+
+	serviceSpec := serviceDetails.Spec
+	serviceSpec.Mode.Replicated.Replicas = &replicas
+	serviceSpec.TaskTemplate.ForceUpdate = uint64(1)
 	
 	serviceOpts := docker.UpdateServiceOptions{
 		Auth: docker.AuthConfiguration{},
 		ServiceSpec: serviceSpec,
-		Version: version,
+		Version: serviceDetails.Meta.Version.Index,
 	}
 
 	if err := d.Client.UpdateService(serviceId,serviceOpts); err != nil {
@@ -154,6 +147,15 @@ func (d Dockerswarm) IsRunning(name string)  bool {
 		fmt.Println("Service Running")
 		return true
 	}
+}
+
+func (d Dockerswarm) DoesServiceExist(name string)  bool {
+	serviceId := d.getServiceId(name)
+	if serviceId == "" {
+		fmt.Println("Service Doesn't exist")
+		return false
+	}
+	return true
 }
 
 
