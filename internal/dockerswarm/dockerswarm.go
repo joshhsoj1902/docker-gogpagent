@@ -88,12 +88,26 @@ func (d Dockerswarm) getAuthConfiguration() docker.AuthConfiguration{
 	return docker.AuthConfiguration{}
 }
 
+// This function is kinda dirty
 func (d Dockerswarm) Start(config Config) {
 	fmt.Println("Docker Starting!")
 
+	serviceSpec := swarm.ServiceSpec{}
+	updating := false
+	serviceId := d.getServiceId(config.Name)
+	var version uint64 
+
 	if d.DoesServiceExist(config.Name) {
-		d.scaleService(config.Name,uint64(1))
-		return
+		updating = true
+
+		serviceDetails, err := d.Client.InspectService(serviceId)
+
+		if err != nil {
+			fmt.Printf("Error InspectService %+v\n",err)
+			return
+		}
+		serviceSpec = serviceDetails.Spec
+		version = serviceDetails.Meta.Version.Index		
 	}
 
 	imagePath := config.Namespace +"/"+config.Image
@@ -105,7 +119,7 @@ func (d Dockerswarm) Start(config Config) {
 
 	replicas := uint64(1)
 
-	serviceSpec := swarm.ServiceSpec{
+	serviceSpec = swarm.ServiceSpec{
 		Annotations: swarm.Annotations{
 			Name: config.Name,
 		},
@@ -121,15 +135,30 @@ func (d Dockerswarm) Start(config Config) {
 			},
 		},
 	}
-	
-	serviceOpts := docker.CreateServiceOptions{
-		Auth: d.getAuthConfiguration(),
-		ServiceSpec: serviceSpec,
-	}
 
-	_, err := d.Client.CreateService(serviceOpts)
-	if err != nil {
-		fmt.Printf("Error Creating service %+v\n",err)
+	if updating {
+		fmt.Println("Updating existing Docker Service!")
+
+		serviceOpts := docker.UpdateServiceOptions{
+			Auth: docker.AuthConfiguration{},
+			ServiceSpec: serviceSpec,
+			Version: version,
+		}
+	
+		if err := d.Client.UpdateService(serviceId,serviceOpts); err != nil {
+			fmt.Printf("Error Updating service: %v\n", err)
+		}
+	} else {
+		fmt.Println("Creating new Docker Service!")
+		serviceOpts := docker.CreateServiceOptions{
+			Auth: d.getAuthConfiguration(),
+			ServiceSpec: serviceSpec,
+		}
+	
+		_, err := d.Client.CreateService(serviceOpts)
+		if err != nil {
+			fmt.Printf("Error Creating service %+v\n",err)
+		}
 	}
 }
 
