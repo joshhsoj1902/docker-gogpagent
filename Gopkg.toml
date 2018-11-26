@@ -40,3 +40,18 @@
 [prune]
   go-tests = true
   unused-packages = true
+
+[[override]]
+  name = "github.com/docker/docker"
+  branch = "master"
+
+[[constraint]]
+  name = "github.com/fsouza/go-dockerclient"
+  branch = "master"
+
+[[override]]
+  name = "github.com/docker/libnetwork"
+  branch = "master"
+[[constraint]]
+  branch = "v1"
+  name = "gopkg.in/yaml.v1"

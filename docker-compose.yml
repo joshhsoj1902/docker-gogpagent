@@ -1,7 +1,8 @@
 version: '2'
 services:
   web:
-    image: joshhsoj1902/docker-ogpweb:latest
+    # image: joshhsoj1902/docker-ogpweb:latest
+    image: joshhsoj1902/docker-kong-ogpweb:latest
     restart: always
     environment:
       - OGP_INSTALL=true
@@ -35,9 +36,15 @@ services:
     image: joshhsoj1902/docker-gogpagent:latest
     ports:
      - "12679:12679"
-    # volumes:
-    #   - /var/run/docker.sock:/var/run/docker.sock
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /home/root/gcloud:/run/secrets/gcloud
     environment:
       - OGP_LISTEN_PORT=12679
       - OGP_KEY=encryption_key2
       - OGP_DOCKER_NAMESPACE=joshhsoj1902
+      - OGP_GCLOUD_JSON=/run/secrets/gcloud
+      - STORAGE=LOCAL
+      # - STORAGE=nfs
+      # - STORAGE_NFS_ADDRESS=fileserver
+      # - STORAGE_NFS_PATH=/mnt/fileserver/path/
