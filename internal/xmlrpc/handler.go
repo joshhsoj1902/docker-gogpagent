@@ -392,8 +392,10 @@ func (agent *AgentService) startServer(gameId string, homeDir string) {
 	}
 
 	dockerServiceConfig := dockerswarm.Config{
+		GameId: gameId,
 		Name: GenerateServiceName(gameId),
 		Namespace: dockerConfig.Namespace,
+		DataVol1: dockerConfig.DataVol1,
 		Image: dockerConfig.Image,
 		Envs: dockerEnv,
 		Ports: ports,

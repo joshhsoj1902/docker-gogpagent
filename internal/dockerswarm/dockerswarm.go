@@ -4,12 +4,15 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strings"
 
 	"github.com/fsouza/go-dockerclient"
 	"github.com/docker/docker/api/types/swarm"
+	"github.com/docker/docker/api/types/mount"
 )
 
 type Config struct {
+	GameId string
 	Name string
 	Ports []swarm.PortConfig
 	Namespace string 
@@ -88,6 +91,44 @@ func (d Dockerswarm) getAuthConfiguration() docker.AuthConfiguration{
 	return docker.AuthConfiguration{}
 }
 
+func (d Dockerswarm) getMount(GameId string, path string) mount.Mount {
+
+	fmt.Printf("Getting MOUNTS. The path: %+v\n", path)
+	fmt.Printf("Getting MOUNTS. The GameId: %+v\n", GameId)
+
+	storageType := strings.ToUpper(os.Getenv("STORAGE"))
+
+	driverOptions := make(map[string]string)
+
+	switch storageType {
+	case "NFS":
+		fmt.Printf("Getting MOUNTS. Building NFS GameId: %+v\n", GameId)
+
+		driverOptions["type"] = "nfs"
+		driverOptions["o"] = "addr="+os.Getenv("STORAGE_NFS_ADDRESS") +",rw"
+		driverOptions["device"] = os.Getenv("STORAGE_NFS_PATH") +"/"+ GameId
+	case "LOCAL":
+	}
+
+	driver := mount.Driver{
+		Name: "local",
+		Options: driverOptions,
+	}
+	volumeOptions :=mount.VolumeOptions{
+		DriverConfig: &driver,
+	}
+	mountObj := mount.Mount{
+		Type: mount.TypeVolume,
+		Source: "volume_"+GameId+"_1", // TODO: This hard codes the volume name with a 1 on the end. 
+		Target: "/home/steam/linuxgsm/serverfiles/" + path,
+		VolumeOptions: &volumeOptions,
+	}
+
+	fmt.Printf("Getting MOUNTS. The MountObg: %+v\n", mountObj)
+
+	return mountObj
+}
+
 // This function is kinda dirty
 func (d Dockerswarm) Start(config Config) {
 	fmt.Println("Docker Starting!")
@@ -112,9 +153,14 @@ func (d Dockerswarm) Start(config Config) {
 
 	imagePath := config.Namespace +"/"+config.Image
 
+	mounts := []mount.Mount{
+		d.getMount(config.GameId,config.DataVol1),
+	}
+
 	containerSpec := swarm.ContainerSpec{
 		Image: imagePath,
 		Env: config.Envs,
+		Mounts: mounts,
 	}
 
 	replicas := uint64(1)
