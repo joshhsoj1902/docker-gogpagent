@@ -5,6 +5,8 @@ import (
 	"io/ioutil"
 	"os"
 	"strings"
+	"bytes"
+	"bufio"
 
 	"github.com/fsouza/go-dockerclient"
 	"github.com/docker/docker/api/types/swarm"
@@ -301,16 +303,25 @@ func (d Dockerswarm) getServiceId(name string) string {
 	return serviceList[0].ID
 }
 
+func (d Dockerswarm) Logs(name string) bytes.Buffer {
+
+	serviceId := d.getServiceId(name)
+
+	var logs bytes.Buffer
+    writer := bufio.NewWriter(&logs)
+
+	opts := docker.LogsServiceOptions{
+		Service: serviceId,
+		OutputStream: writer,
+		Stdout:     true,
+		Stderr:     true,
+		Timestamps: true,
+		Tail: "100",
+	}
+
+	d.Client.GetServiceLogs(opts)
+
+	return logs
+}
 
 
-// func (d Dockerswarm) Pull(image string) {
-// 	//Pull image from Registry
-// 	opts := docker.PullImageOptions{Repository: image}
-// 	err := d.Client.PullImage(opts, docker.AuthConfiguration{})
-// 	if err != nil {
-// 		fmt.Println(err.Error())
-// 		return
-// 	}
-
-// 	fmt.Println("Docker Image Downloaded")
-// }

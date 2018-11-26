@@ -41,7 +41,7 @@ func Decode2 (src *string) error {
 	return nil
 }
 
-func Encode (src string) (string, error) {
+func Encode (src string) (string) {
 	// Decode and Decrypt params
 	encodeData1 := base64.StdEncoding.EncodeToString([]byte(src))
 	// if err != nil {
@@ -51,7 +51,7 @@ func Encode (src string) (string, error) {
 	encode_data := string(xxtea.Encrypt([]byte(encodeData1), []byte(os.Getenv("OGP_KEY"))))
 	encodeData2 := base64.StdEncoding.EncodeToString([]byte(encode_data))
 
-	return string(encodeData2), nil
+	return string(encodeData2)
 }
 
 func decode_body(body io.Reader, o interface{}) error {

@@ -528,14 +528,14 @@ func (agent *AgentService) Stop_server(r *http.Request, args *struct{GameId stri
     return nil
 }
 
-func (agent *AgentService) Get_log(r *http.Request, args *struct{Arg1 string;Arg2 string;Arg3 string;Arg4 string;Arg5 string;Arg6 string}, reply *struct{Message string}) error {
+func (agent *AgentService) Get_log(r *http.Request, args *struct{Arg1 string;GameId string;Arg3 string;Arg4 string;Arg5 string;Arg6 string}, reply *struct{Message string}) error {
 	fmt.Println("==== Get_log ====")
-	var myResult = "Foobar"
+	// var myResult = "Foobar\nBAnana"
 
 	if err := Decode2(&args.Arg1); err != nil {
 		fmt.Printf("Error decoding: %v\n", err)
 	}
-	if err := Decode2(&args.Arg2); err != nil {
+	if err := Decode2(&args.GameId); err != nil {
 		fmt.Printf("Error decoding: %v\n", err)
 	}
 	if err := Decode2(&args.Arg3); err != nil {
@@ -551,10 +551,15 @@ func (agent *AgentService) Get_log(r *http.Request, args *struct{Arg1 string;Arg
 		fmt.Printf("Error decoding: %v\n", err)
 	}
 
-	reply.Message = myResult
+	logs := agent.Docker.Logs(args.GameId)
+
+	// fmt.Printf("LOGS: %+v\n", logs.String())
+
+	reply.Message = "1;"+ base64.StdEncoding.EncodeToString([]byte(logs.String()))
 	
+
 	fmt.Printf(">> decoded Arg1: %v\n", args.Arg1)
-	fmt.Printf(">> decoded Arg2: %v\n", args.Arg2)
+	fmt.Printf(">> decoded GameId: %v\n", args.GameId)
 	fmt.Printf(">> decoded Arg3: %v\n", args.Arg3)
 	fmt.Printf(">> decoded Arg4: %v\n", args.Arg4)
 	fmt.Printf(">> decoded Arg5: %v\n", args.Arg5)
@@ -641,7 +646,7 @@ func (agent *AgentService) Writefile(r *http.Request, args *struct{FilePath stri
 
 
 func (agent *AgentService) Steam_cmd(r *http.Request, args *struct{Arg1 string;Arg2 string;Arg3 string;Arg4 string;Arg5 string;Arg6 string;Arg7 string;Arg8 string;Arg9 string;Arg10 string;Arg11 string;Arg12 string;Arg13 string;Arg14 string;Arg15 string;Arg16 string;Arg17 string}, reply *struct{Message string}) error {
-	fmt.Println("==== Get_log ====")
+	fmt.Println("==== Steam_cmd ====")
 	var myResult = "Foobar"
 
 	if err := Decode2(&args.Arg1); err != nil {
