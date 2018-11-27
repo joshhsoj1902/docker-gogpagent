@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"os"
 	"time"
+	"strconv"
 
 	"github.com/joshhsoj1902/docker-gogpagent/internal/dockerswarm"
 	"github.com/docker/docker/api/types/swarm"
@@ -391,6 +392,9 @@ func (agent *AgentService) startServer(gameId string, homeDir string) {
 		},
 	}
 
+	dockerEnv = append(dockerEnv, "LGSM_PORT="+strconv.Itoa(int(dockerConfig.Port)))
+	dockerEnv = append(dockerEnv, "LGSM_MAXPLAYERS="+strconv.Itoa(int(dockerConfig.Maxplayers)))
+
 	dockerServiceConfig := dockerswarm.Config{
 		GameId: gameId,
 		Name: GenerateServiceName(gameId),
@@ -423,7 +427,7 @@ func (agent *AgentService) Restart_server(r *http.Request, args *struct{GameId s
 	}
 	if err := Decode2(&args.Arg5); err != nil {
 		fmt.Printf("Error decoding: %v\n", err)
-	}
+	}	
 	if err := Decode2(&args.Arg6); err != nil {
 		fmt.Printf("Error decoding: %v\n", err)
 	}
