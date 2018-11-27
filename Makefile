@@ -1,5 +1,5 @@
 build-docker:
-	docker build -f build/Dockerfile -t joshhsoj1902/docker-gogpagent .
+	docker build -f Dockerfile -t joshhsoj1902/docker-gogpagent .
 
 build:
 	go build -o main cmd/main/main.go
