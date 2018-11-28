@@ -102,13 +102,15 @@ func (d Dockerswarm) getMount(GameId string, path string) mount.Mount {
 
 	driverOptions := make(map[string]string)
 
+// TODO, IF NFS, we could delete the volume before mounting it (to ensure all changes are there)
+
 	switch storageType {
 	case "NFS":
 		fmt.Printf("Getting MOUNTS. Building NFS GameId: %+v\n", GameId)
 
 		driverOptions["type"] = "nfs"
 		driverOptions["o"] = "addr="+os.Getenv("STORAGE_NFS_ADDRESS") +",rw"
-		driverOptions["device"] = os.Getenv("STORAGE_NFS_PATH") +"/"+ GameId
+		driverOptions["device"] = ":"+os.Getenv("STORAGE_NFS_PATH") +"/"+ GameId
 	case "LOCAL":
 	}
 
@@ -117,6 +119,7 @@ func (d Dockerswarm) getMount(GameId string, path string) mount.Mount {
 		Options: driverOptions,
 	}
 	volumeOptions :=mount.VolumeOptions{
+		NoCopy: true,
 		DriverConfig: &driver,
 	}
 	mountObj := mount.Mount{
