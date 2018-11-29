@@ -1,0 +1,46 @@
+defaults: &defaults 
+    working_directory: ~/build
+    docker: 
+      - image: joshhsoj1902/circleci-build-image:1.0.7@sha256:1090a162859845e7a5168c02b161ddf053b93a1e5a5f26351bbb3b25507a5974
+version: 2.1
+
+orbs:
+    docker: joshhsoj1902/docker@0.0.1
+
+jobs:
+  setup:
+    <<: *defaults
+    steps:
+      - checkout
+      - run: 
+          name: setup workspace
+          background: true
+          command: |
+            cp -rp docker-compose.yml Makefile scripts /tmp/workspace
+            ls -ltr /tmp/workspace
+      - persist_to_workspace:
+          root: /tmp/workspace
+          paths: 
+            - docker-compose.yml
+            - Makefile
+            - scripts
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - setup
+      - docker/build:
+          context: org-global
+          tag: latest
+          requires: 
+            - setup
+      - docker/compose-test-health:
+          name: compose-test
+          # composeFile: docker-compose.citest.yml
+          composeFile: docker-compose.yml
+          service: game
+          requires:
+            - docker/build
+ 
+
