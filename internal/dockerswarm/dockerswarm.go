@@ -134,6 +134,22 @@ func (d Dockerswarm) getMount(GameId string, path string) mount.Mount {
 	return mountObj
 }
 
+func (d Dockerswarm) getPlacementConstraints() []string {
+	constraints := []string{}
+
+	//TODO: This could be a loop
+	if os.Getenv("PLACEMENT_CONSTRAINT_1") != "" {
+		constraints = append(constraints, os.Getenv("PLACEMENT_CONSTRAINT_1"))
+	}
+	if os.Getenv("PLACEMENT_CONSTRAINT_2") != "" {
+		constraints = append(constraints, os.Getenv("PLACEMENT_CONSTRAINT_2"))
+	}
+	if os.Getenv("PLACEMENT_CONSTRAINT_3") != "" {
+		constraints = append(constraints, os.Getenv("PLACEMENT_CONSTRAINT_3"))
+	}
+	return constraints
+}
+
 // This function is kinda dirty
 func (d Dockerswarm) Start(config Config) {
 	fmt.Println("Docker Starting!")
@@ -168,6 +184,10 @@ func (d Dockerswarm) Start(config Config) {
 		Mounts: mounts,
 	}
 
+	placement := swarm.Placement{
+		Constraints: d.getPlacementConstraints(),
+	}
+
 	replicas := uint64(1)
 
 	serviceSpec = swarm.ServiceSpec{
@@ -176,6 +196,7 @@ func (d Dockerswarm) Start(config Config) {
 		},
 		TaskTemplate: swarm.TaskSpec{
 			ContainerSpec: &containerSpec,
+			Placement: &placement,
 		},
 		EndpointSpec: &swarm.EndpointSpec{
 			Ports: config.Ports,
