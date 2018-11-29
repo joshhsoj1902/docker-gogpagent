@@ -5,7 +5,7 @@ defaults: &defaults
 version: 2.1
 
 orbs:
-    docker: joshhsoj1902/docker@0.0.1
+    docker: joshhsoj1902/docker@0.1.0
 
 jobs:
   setup:
@@ -32,6 +32,7 @@ workflows:
       - setup
       - docker/build:
           context: org-global
+          image: joshhsoj1902/docker-gogpagent
           tag: latest
           requires: 
             - setup
@@ -39,7 +40,7 @@ workflows:
           name: compose-test
           # composeFile: docker-compose.citest.yml
           composeFile: docker-compose.yml
-          service: game
+          service: agent
           requires:
             - docker/build
  
