@@ -7,4 +7,6 @@ RUN env
 RUN ls -ltr
 RUN make build
 ENV USERNAME=agent
+HEALTHCHECK CMD curl --fail http://localhost:12679/health || exit 1  
+
 CMD ["/go/src/github.com/joshhsoj1902/docker-gogpagent/main"]

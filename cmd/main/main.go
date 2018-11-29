@@ -8,6 +8,7 @@ import (
 
     "github.com/joshhsoj1902/docker-gogpagent/internal/xmlrpc"
     "github.com/joshhsoj1902/docker-gogpagent/internal/dockerswarm"
+    "github.com/joshhsoj1902/docker-gogpagent/internal/health"
     "github.com/gorilla/rpc"
     "github.com/divan/gorilla-xmlrpc/xml"
 )
@@ -36,6 +37,9 @@ func main() {
 
     log.Println("Starting XML-RPC server on localhost:12679/RPC2")
 
+    http.HandleFunc("/health", health.StatusHandler)
+
     // docker.Start()
     log.Fatal(http.ListenAndServe(":12679", handlers.LoggingHandler(os.Stdout, http.DefaultServeMux)))
+
 }
