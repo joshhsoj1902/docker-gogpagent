@@ -36,12 +36,12 @@ workflows:
           tag: latest
           requires: 
             - setup
-      - docker/compose-test-health:
-          name: compose-test
-          # composeFile: docker-compose.citest.yml
-          composeFile: docker-compose.yml
-          service: agent
-          requires:
-            - docker/build
+      # - docker/compose-test-health:
+      #     name: compose-test
+      #     # composeFile: docker-compose.citest.yml
+      #     composeFile: docker-compose.yml
+      #     service: agent
+      #     requires:
+      #       - docker/build
  
 
