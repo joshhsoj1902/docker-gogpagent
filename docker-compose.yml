@@ -48,3 +48,6 @@ services:
       # - STORAGE=nfs
       # - STORAGE_NFS_ADDRESS=fileserver
       # - STORAGE_NFS_PATH=/mnt/fileserver/path/
+      # - PLACEMENT_CONSTRAINT_1=node.role == manager
+      # - PLACEMENT_CONSTRAINT_2=node.labels.foo == true
+      # - PLACEMENT_CONSTRAINT_3=baz
