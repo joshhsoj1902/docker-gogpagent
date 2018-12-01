@@ -220,8 +220,7 @@ func (d Dockerswarm) Start(config Config) {
 
 	imagePath := config.Namespace +"/"+config.Image
 
-	mounts := d.getMounts("100",config.DataVols)
-	// mounts := d.getMounts(config.GameId,config.DataVols)
+	mounts := d.getMounts(config.GameId,config.DataVols)
 
 	containerSpec := swarm.ContainerSpec{
 		Image: imagePath,
