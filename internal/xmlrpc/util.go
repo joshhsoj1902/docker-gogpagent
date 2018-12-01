@@ -92,6 +92,7 @@ type DockerConfig struct {
 	Namespace string `yaml:"namespace"`
 	Image string `yaml:"image"`
 	DataVol1 string `yaml:"dataVol1"`
+	DataVols string `yaml:"dataVols"`
 	Maxplayers int `yaml:"maxplayers"`
 	Version string `yaml:"version"`
   }
@@ -112,9 +113,6 @@ func ParseConfigYaml(file string) (DockerConfig, error) {
 	if err != nil {
 	  return DockerConfig{}, err
 	}
-  
-	// fmt.Printf("Value: %#v\n", config.Port)
-	// fmt.Printf("Value: %#v\n", config.Namespace)
 
 	return config, nil
 }

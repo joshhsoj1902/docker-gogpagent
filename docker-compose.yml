@@ -1,4 +1,11 @@
-version: '2'
+version: '3.3'
+# volumes:
+#   games:
+#     driver: local
+#     driver_opts:
+#       type: ${DRIVER_TYPE:-nfs}
+#       o: ${DRIVER_OPTIONS:-addr=fileserver,rw}
+#       device: ${DRIVER_DEVICE:-:/mnt/fileserver/path/}
 services:
   web:
     # image: joshhsoj1902/docker-ogpweb:latest
@@ -39,6 +46,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /home/root/gcloud:/run/secrets/gcloud
+      # - games:/mnt/games/:nocopy
     environment:
       - OGP_LISTEN_PORT=12679
       - OGP_KEY=encryption_key2
@@ -48,6 +56,8 @@ services:
       # - STORAGE=nfs
       # - STORAGE_NFS_ADDRESS=fileserver
       # - STORAGE_NFS_PATH=/mnt/fileserver/path/
+      # - NFS_CREATE_DIRS=true
+      # - NFS_MOUNT_LOCATION=/mnt/games
       # - PLACEMENT_CONSTRAINT_1=node.role == manager
       # - PLACEMENT_CONSTRAINT_2=node.labels.foo == true
       # - PLACEMENT_CONSTRAINT_3=baz
