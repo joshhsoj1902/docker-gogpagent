@@ -5,7 +5,7 @@ defaults: &defaults
 version: 2.1
 
 orbs:
-    docker: joshhsoj1902/docker@0.1.0
+    docker: joshhsoj1902/docker@0.2.0
 
 jobs:
   setup:
@@ -36,12 +36,11 @@ workflows:
           tag: latest
           requires: 
             - setup
-      # - docker/compose-test-health:
-      #     name: compose-test
-      #     # composeFile: docker-compose.citest.yml
-      #     composeFile: docker-compose.yml
-      #     service: agent
-      #     requires:
-      #       - docker/build
+      - docker/container-health:
+          name: compose-test-web
+          composeFile: docker-compose.yml
+          service: web
+          requires:
+            - docker/build
  
 
