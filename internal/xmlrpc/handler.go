@@ -400,6 +400,7 @@ func (agent *AgentService) startServer(gameId string, homeDir string) {
 		Name: GenerateServiceName(gameId),
 		Namespace: dockerConfig.Namespace,
 		DataVol1: dockerConfig.DataVol1,
+		DataVols: dockerConfig.DataVols,
 		Image: dockerConfig.Image,
 		Envs: dockerEnv,
 		Ports: ports,

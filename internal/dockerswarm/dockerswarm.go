@@ -20,6 +20,7 @@ type Config struct {
 	Namespace string 
 	Image string 
 	DataVol1 string 
+	DataVols string 
 	Maxplayers string 
 	Version string
 	Envs	[]string
@@ -35,21 +36,22 @@ func NewBackend() Dockerswarm {
 	if err != nil {
 		panic(err)
 	}
-	imgs, err := client.ListImages(docker.ListImagesOptions{All: false})
-	if err != nil {
-		panic(err)
-	}
-	for _, img := range imgs {
-		fmt.Println("ID: ", img.ID)
-		fmt.Println("RepoTags: ", img.RepoTags)
-		fmt.Println("Created: ", img.Created)
-		fmt.Println("Size: ", img.Size)
-		fmt.Println("VirtualSize: ", img.VirtualSize)
-		fmt.Println("ParentId: ", img.ParentID)
-	}
+	// imgs, err := client.ListImages(docker.ListImagesOptions{All: false})
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// for _, img := range imgs {
+	// 	fmt.Println("ID: ", img.ID)
+	// 	fmt.Println("RepoTags: ", img.RepoTags)
+	// 	fmt.Println("Created: ", img.Created)
+	// 	fmt.Println("Size: ", img.Size)
+	// 	fmt.Println("VirtualSize: ", img.VirtualSize)
+	// 	fmt.Println("ParentId: ", img.ParentID)
+	// }
 
 	return Dockerswarm{Client: client}
 }
+
 
 // func (d Dockerswarm) getAuthConfigurations() docker.AuthConfigurations{
 
@@ -93,35 +95,82 @@ func (d Dockerswarm) getAuthConfiguration() docker.AuthConfiguration{
 	return docker.AuthConfiguration{}
 }
 
+func (d Dockerswarm) getMounts(GameId string, paths string) []mount.Mount {
+	var mounts []mount.Mount
+
+    // Split on comma.
+    result := strings.Split(paths, ",")
+
+    // Display all elements.
+    for i := range result {
+        fmt.Println(result[i])
+		mounts = append(mounts, d.getMount(GameId, result[i]))
+    }
+    // Length is 3.
+    fmt.Println(len(result))
+
+	return mounts
+}
+
+func (d Dockerswarm) removeVolume(name string) {
+  opts := docker.RemoveVolumeOptions{
+	  Name: name,
+	  Force: true,
+  } 
+  d.Client.RemoveVolumeWithOptions(opts)
+}
+
+//TODO create another function that loops over a list calling this
 func (d Dockerswarm) getMount(GameId string, path string) mount.Mount {
 
 	fmt.Printf("Getting MOUNTS. The path: %+v\n", path)
 	fmt.Printf("Getting MOUNTS. The GameId: %+v\n", GameId)
 
+
+	safePath := strings.Replace(path, "/", "_", -1)
+	volumeName := "games_"+GameId+"_"+safePath
+
+
 	storageType := strings.ToUpper(os.Getenv("STORAGE"))
 
 	driverOptions := make(map[string]string)
+
+// TODO, IF NFS, we could delete the volume before mounting it (to ensure all changes are there)
 
 	switch storageType {
 	case "NFS":
 		fmt.Printf("Getting MOUNTS. Building NFS GameId: %+v\n", GameId)
 
+		d.removeVolume(volumeName)
+
+		if os.Getenv("NFS_CREATE_DIRS") == "true" {
+			filePath := os.Getenv("NFS_MOUNT_LOCATION") + "/" + GameId + "/" + path
+			if _, err := os.Stat(filePath); os.IsNotExist(err) {
+				fmt.Printf("Dir not found, CREATING: %v\n", filePath)
+				if err := os.MkdirAll(filePath, 0777); err != nil {
+					fmt.Printf("Error Creating Dir: %v\n", err)
+				}
+			}
+		}
+
 		driverOptions["type"] = "nfs"
 		driverOptions["o"] = "addr="+os.Getenv("STORAGE_NFS_ADDRESS") +",rw"
-		driverOptions["device"] = os.Getenv("STORAGE_NFS_PATH") +"/"+ GameId
+		driverOptions["device"] = ":"+os.Getenv("STORAGE_NFS_PATH") +"/"+ GameId + "/" + path
 	case "LOCAL":
 	}
+
 
 	driver := mount.Driver{
 		Name: "local",
 		Options: driverOptions,
 	}
 	volumeOptions :=mount.VolumeOptions{
+		NoCopy: true,
 		DriverConfig: &driver,
 	}
 	mountObj := mount.Mount{
 		Type: mount.TypeVolume,
-		Source: "volume_"+GameId+"_1", // TODO: This hard codes the volume name with a 1 on the end. 
+		Source: volumeName, 
 		Target: "/home/steam/linuxgsm/serverfiles/" + path,
 		VolumeOptions: &volumeOptions,
 	}
@@ -129,6 +178,22 @@ func (d Dockerswarm) getMount(GameId string, path string) mount.Mount {
 	fmt.Printf("Getting MOUNTS. The MountObg: %+v\n", mountObj)
 
 	return mountObj
+}
+
+func (d Dockerswarm) getPlacementConstraints() []string {
+	constraints := []string{}
+
+	//TODO: This could be a loop
+	if os.Getenv("PLACEMENT_CONSTRAINT_1") != "" {
+		constraints = append(constraints, os.Getenv("PLACEMENT_CONSTRAINT_1"))
+	}
+	if os.Getenv("PLACEMENT_CONSTRAINT_2") != "" {
+		constraints = append(constraints, os.Getenv("PLACEMENT_CONSTRAINT_2"))
+	}
+	if os.Getenv("PLACEMENT_CONSTRAINT_3") != "" {
+		constraints = append(constraints, os.Getenv("PLACEMENT_CONSTRAINT_3"))
+	}
+	return constraints
 }
 
 // This function is kinda dirty
@@ -155,14 +220,16 @@ func (d Dockerswarm) Start(config Config) {
 
 	imagePath := config.Namespace +"/"+config.Image
 
-	mounts := []mount.Mount{
-		d.getMount(config.GameId,config.DataVol1),
-	}
+	mounts := d.getMounts(config.GameId,config.DataVols)
 
 	containerSpec := swarm.ContainerSpec{
 		Image: imagePath,
 		Env: config.Envs,
 		Mounts: mounts,
+	}
+
+	placement := swarm.Placement{
+		Constraints: d.getPlacementConstraints(),
 	}
 
 	replicas := uint64(1)
@@ -173,6 +240,7 @@ func (d Dockerswarm) Start(config Config) {
 		},
 		TaskTemplate: swarm.TaskSpec{
 			ContainerSpec: &containerSpec,
+			Placement: &placement,
 		},
 		EndpointSpec: &swarm.EndpointSpec{
 			Ports: config.Ports,
