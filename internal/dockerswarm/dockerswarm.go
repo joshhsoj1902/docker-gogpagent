@@ -171,9 +171,10 @@ func (d Dockerswarm) getMount(GameId string, path string) mount.Mount {
 	mountObj := mount.Mount{
 		Type: mount.TypeVolume,
 		Source: volumeName, 
-		Target: "/home/steam/linuxgsm/serverfiles/" + path,
+		Target: "/home/linuxgsm/linuxgsm/serverfiles/" + path,
 		VolumeOptions: &volumeOptions,
 	}
+	// TODO make the above file path configerable
 
 	fmt.Printf("Getting MOUNTS. The MountObg: %+v\n", mountObj)
 
