@@ -75,6 +75,21 @@ func NewBackend() Dockerswarm {
 // 	return configs
 // }
 
+func (d Dockerswarm) PullImage(namespace string, image string, tag string) {
+	opts := docker.PullImageOptions{
+		Repository: namespace +"/"+image,
+		Tag: tag,
+		OutputStream: os.Stdout,
+	}
+
+	auth := d.getAuthConfiguration()
+
+	err := d.Client.PullImage(opts, auth)
+	if err != nil {
+		fmt.Printf("Error Pulling image %+v\n",err)
+	}
+}
+
 func (d Dockerswarm) getAuthConfiguration() docker.AuthConfiguration{
 
 	gcloudFile := os.Getenv("OGP_GCLOUD_JSON")
@@ -220,6 +235,9 @@ func (d Dockerswarm) Start(config Config) {
 	}
 
 	imagePath := config.Namespace +"/"+config.Image
+	if config.Version != "" {
+		imagePath = imagePath + ":" + config.Version
+	}
 
 	mounts := d.getMounts(config.GameId,config.DataVols)
 
