@@ -395,6 +395,14 @@ func (agent *AgentService) startServer(gameId string, homeDir string) {
 	dockerEnv = append(dockerEnv, "LGSM_PORT="+strconv.Itoa(int(dockerConfig.Port)))
 	dockerEnv = append(dockerEnv, "LGSM_MAXPLAYERS="+strconv.Itoa(int(dockerConfig.Maxplayers)))
 
+	// var image string
+
+	// if dockerConfig.Version != "" {
+	// 	image = dockerConfig.Image + ":" + dockerConfig.Version
+	// } else {
+	// 	image = dockerConfig.Image
+	// }
+
 	dockerServiceConfig := dockerswarm.Config{
 		GameId: gameId,
 		Name: GenerateServiceName(gameId),
@@ -402,6 +410,7 @@ func (agent *AgentService) startServer(gameId string, homeDir string) {
 		DataVol1: dockerConfig.DataVol1,
 		DataVols: dockerConfig.DataVols,
 		Image: dockerConfig.Image,
+		Version: dockerConfig.Version,
 		Envs: dockerEnv,
 		Ports: ports,
 	}
