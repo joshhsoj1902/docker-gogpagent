@@ -5,7 +5,7 @@ defaults: &defaults
 version: 2.1
 
 orbs:
-    docker: joshhsoj1902/docker@0.14.0
+    docker: joshhsoj1902/docker@0.15.0
 
 jobs:
   setup:
